@@ -17,10 +17,6 @@ WORKDIR /app
 # Mount HTTPS folder từ host vào container
 VOLUME ["/https"]
 
-# Tạo cert dev nếu chưa có
-RUN if [ ! -f /https/aspnetapp.pfx ]; then \
-        dotnet dev-certs https -ep /https/aspnetapp.pfx -p 123456; \
-    fi
 
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "BE.dll"]
