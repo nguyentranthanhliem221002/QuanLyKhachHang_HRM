@@ -1,0 +1,22 @@
+# ASP.NET Core
+bin/
+obj/
+*.user
+*.suo
+*.swp
+*.vs/
+.vscode/
+.vsconfig
+launchSettings.json
+
+# Build output
+out/
+publish/
+*.log
+
+# Environment
+.env
+.env.*
+
+# Docker
+docker-compose.override.yml

@@ -1,0 +1,32 @@
+# version: "3.9"
+services:
+  be:
+    build:
+      context: ./BE
+      dockerfile: Dockerfile_BE
+    ports:
+      - "5000:8080"
+      - "5002:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_Kestrel__Certificates__Default__Path}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_Kestrel__Certificates__Default__Password}
+    volumes:
+      - ./https:/https
+
+  fe:
+    build:
+      context: ./FE
+      dockerfile: Dockerfile_FE
+    ports:
+      - "5001:8080"
+      - "5003:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ASPNETCORE_URLS=${ASPNETCORE_URLS}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_Kestrel__Certificates__Default__Path}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_Kestrel__Certificates__Default__Password}
+      - API_URL=${API_URL}
+    volumes:
+      - ./https:/https

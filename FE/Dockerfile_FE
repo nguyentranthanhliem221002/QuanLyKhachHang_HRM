@@ -1,0 +1,24 @@
+﻿# Dockerfile_FE
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+EXPOSE 8080
+EXPOSE 443
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY ["FE.csproj", "./"]
+RUN dotnet restore "FE.csproj"
+COPY . .
+RUN dotnet publish "FE.csproj" -c Release -o /app/publish
+
+FROM base AS final
+WORKDIR /app
+
+VOLUME ["/https"]
+
+RUN if [ ! -f /https/aspnetapp.pfx ]; then \
+        dotnet dev-certs https -ep /https/aspnetapp.pfx -p 123456; \
+    fi
+
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "FE.dll"]
