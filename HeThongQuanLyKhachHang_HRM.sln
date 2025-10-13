@@ -5,6 +5,16 @@ VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BE", "BE\BE.csproj", "{7E54E28F-4507-43D7-AA3E-9B2B35F39DDC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FE", "FE\FE.csproj", "{0053527C-53F0-4F9C-9C36-475E17B44DF0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EB19B4C6-7804-4432-A374-3DA49DFB888D}"
+	ProjectSection(SolutionItems) = preProject
+		.env = .env
+		docker-compose.yml = docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "https", "https", "{5142BAFE-5134-4DD0-9FE2-359C23FD8012}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +25,10 @@ Global
 		{7E54E28F-4507-43D7-AA3E-9B2B35F39DDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E54E28F-4507-43D7-AA3E-9B2B35F39DDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E54E28F-4507-43D7-AA3E-9B2B35F39DDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0053527C-53F0-4F9C-9C36-475E17B44DF0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0053527C-53F0-4F9C-9C36-475E17B44DF0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0053527C-53F0-4F9C-9C36-475E17B44DF0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0053527C-53F0-4F9C-9C36-475E17B44DF0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

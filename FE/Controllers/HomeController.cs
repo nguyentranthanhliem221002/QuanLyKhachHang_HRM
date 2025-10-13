@@ -13,11 +13,16 @@ namespace FE.Controllers
             _logger = logger;
         }
 
+        //public IActionResult Index()
+        //{
+        //    return View();
+        //}
         public IActionResult Index()
         {
+            var username = HttpContext.Session.GetString("UserName");
+            ViewBag.UserName = username;
             return View();
         }
-
         public IActionResult Privacy()
         {
             return View();

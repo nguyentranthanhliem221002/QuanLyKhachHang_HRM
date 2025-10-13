@@ -1,31 +1,96 @@
+﻿# services:
+#   be:
+#     build:
+#       context: ./BE
+#       dockerfile: Dockerfile_BE
+#     ports:
+#       - "5000:8080"
+#       - "5002:443"
+#     environment:
+#       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+#       - ASPNETCORE_URLS=https://+:443;http://+:8080
+#       - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_Kestrel__Certificates__Default__Path}
+#       - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_Kestrel__Certificates__Default__Password}
+#     volumes:
+#       - ./https:/https
+
+#   fe:
+#     build:
+#       context: ./FE
+#       dockerfile: Dockerfile_FE
+#     ports:
+#       - "5001:8080"
+#       - "5003:443"
+#     environment:
+#       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+#       - ASPNETCORE_URLS=https://+:443;http://+:8080
+#       - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_Kestrel__Certificates__Default__Path}
+#       - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_Kestrel__Certificates__Default__Password}
+#       - API_URL=${API_URL}
+#     volumes:
+#       - ./https:/https
+
+# version: "3.9"
+
+version: '3.9'
+
 services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "${SA_PASSWORD}"
+    ports:
+      - "${DB_PORT}:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - hrm-network
+
   be:
     build:
       context: ./BE
       dockerfile: Dockerfile_BE
     ports:
-      - "5000:8080"
-      - "5002:443"
+      - "5000:8080"  # HTTP
+      - "5002:443"   # HTTPS
     environment:
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ASPNETCORE_URLS=https://+:443;http://+:8080
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_Kestrel__Certificates__Default__Path}
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_Kestrel__Certificates__Default__Password}
+      - ASPNETCORE_ENVIRONMENT
+      - ASPNETCORE_URLS
+      - ASPNETCORE_Kestrel__Certificates__Default__Path
+      - ASPNETCORE_Kestrel__Certificates__Default__Password
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=${DB_NAME};User Id=${DB_USER};Password=${SA_PASSWORD};TrustServerCertificate=True;
+    depends_on:
+      - sqlserver
     volumes:
       - ./https:/https
+    networks:
+      - hrm-network
 
   fe:
     build:
       context: ./FE
       dockerfile: Dockerfile_FE
     ports:
-      - "5001:8080"
-      - "5003:443"
+      - "5001:8080"  # HTTP
+      - "5003:443"   # HTTPS
     environment:
-      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-      - ASPNETCORE_URLS=https://+:443;http://+:8080
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${ASPNETCORE_Kestrel__Certificates__Default__Path}
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${ASPNETCORE_Kestrel__Certificates__Default__Password}
-      - API_URL=${API_URL}
+      - ASPNETCORE_ENVIRONMENT
+      - ASPNETCORE_URLS
+      - ASPNETCORE_Kestrel__Certificates__Default__Path
+      - ASPNETCORE_Kestrel__Certificates__Default__Password
+      - API_URL
+    depends_on:
+      - be
     volumes:
       - ./https:/https
+    networks:
+      - hrm-network
+
+volumes:
+  sqlserver_data:
+
+networks:
+  hrm-network:
+    driver: bridge
