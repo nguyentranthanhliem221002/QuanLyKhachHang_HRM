@@ -1,0 +1,22 @@
+﻿@model string[]
+@{
+    ViewData["Title"] = "Chọn môn kiểm tra";
+}
+
+<div class="container mt-4">
+    <h3>Chọn môn học để kiểm tra năng lực</h3>
+
+    <div class="row mt-3">
+        @foreach (var subject in Model)
+        {
+            <div class="col-md-2 mb-3">
+                <div class="card h-100 shadow-sm border-0 rounded-3 text-center p-3">
+                    <h5 class="card-title">@subject</h5>
+                    <a href="@Url.Action("Start", "Test", new { subject = subject })" class="btn btn-success btn-sm mt-2">
+                        Bắt đầu
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>

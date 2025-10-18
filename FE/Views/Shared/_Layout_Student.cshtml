@@ -1,0 +1,47 @@
+﻿@{
+    Layout = null;
+    var studentName = User.Identity?.Name ?? "Học viên";
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Khu vực học viên</title>
+    <link rel="stylesheet" href="~/css/student.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/Student/Dashboard">🎓 Trung tâm đào tạo</a>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link">@studentName</a></li>
+                <li class="nav-item"><a class="nav-link" href="/Account/Logout">Đăng xuất</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-2 bg-light sidebar p-3">
+                <h6 class="text-uppercase">Menu học viên</h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a class="nav-link" href="/Student/Dashboard">🏠 Bảng điều khiển</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Student/MyCourses">📘 Khóa học của tôi</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Student/Payments">💳 Thanh toán</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/Student/Feedback">💬 Góp ý khóa học</a></li>
+                </ul>
+            </div>
+            <div class="col-10 p-4">
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center text-muted mt-3">
+        <hr />
+        <p>© 2025 - Trung tâm đào tạo Web Over Lazy</p>
+    </footer>
+</body>
+</html>

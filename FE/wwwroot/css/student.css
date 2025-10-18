@@ -1,0 +1,14 @@
+.sidebar {
+    min-height: 100vh;
+    border-right: 1px solid #ddd;
+}
+
+    .sidebar .nav-link {
+        color: #333;
+        margin: 4px 0;
+    }
+
+        .sidebar .nav-link:hover {
+            background-color: #e8f0fe;
+            border-radius: 6px;
+        }

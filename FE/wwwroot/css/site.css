@@ -1,4 +1,4 @@
-html {
+/*html {
   font-size: 14px;
 }
 
@@ -19,4 +19,19 @@ html {
 
 body {
   margin-bottom: 60px;
+}*/
+*{
+    margin: 0px;
+    padding: 0px;
+    font-family: 'Roboto', sans-serif;
+}
+/*.banner_01{
+    background-image: url(../images/Background_Home.jpg);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}*/
+.card:hover {
+    transform: translateY(-5px);
+    transition: all 0.3s ease;
 }

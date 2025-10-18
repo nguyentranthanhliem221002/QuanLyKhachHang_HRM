@@ -2,10 +2,13 @@
 {
     public class User
     {
-        public int Id { get; set; }           // Primary key
-        public string UserName { get; set; }  // Tên người dùng
-        public string Email { get; set; }     // Email
-        public string Password { get; set; }  // Mật khẩu (hash sau này)
-        public string Role { get; set; }      // Vai trò (Admin, Customer, v.v.)
+        public int Id { get; set; }         
+        public string UserName { get; set; }
+        public string? Email { get; set; }
+        public string Password { get; set; }
+        public string? FullName { get; set; }
+
+        public string Role { get; set; }      
+        public int Status {  get; set; }
     }
 }

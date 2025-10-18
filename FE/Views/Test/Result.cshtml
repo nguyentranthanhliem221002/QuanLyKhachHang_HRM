@@ -1,0 +1,19 @@
+﻿@model FE.Models.TestResultViewModel
+@{
+    ViewData["Title"] = "Kết quả bài kiểm tra - " + Model.Subject;
+}
+
+<div class="container mt-4">
+    <h3>Kết quả bài kiểm tra môn: @Model.Subject</h3>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <p><strong>Điểm số:</strong> @Model.Score</p>
+            <p><strong>Trình độ:</strong> @Model.Level</p>
+        </div>
+    </div>
+
+    <a href="@Url.Action("SelectSubject", "Test")" class="btn btn-primary mt-3">
+        Quay lại chọn môn
+    </a>
+</div>

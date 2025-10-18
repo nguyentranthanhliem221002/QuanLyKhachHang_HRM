@@ -23,10 +23,9 @@ namespace FE.Controllers
             ViewBag.UserName = username;
             return View();
         }
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+
+        public ActionResult Contact() => View();
+        public ActionResult About() => View();
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

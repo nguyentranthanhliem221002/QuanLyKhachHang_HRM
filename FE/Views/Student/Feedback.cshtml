@@ -1,0 +1,37 @@
+﻿@model FE.Models.FeedbackViewModel
+@{
+    ViewData["Title"] = "Góp ý khóa học";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+}
+
+<h2>💬 Góp ý khóa học</h2>
+
+<form asp-action="SubmitFeedback" method="post">
+    <div class="mb-3">
+        <label for="CourseId" class="form-label">Chọn khóa học</label>
+        <select id="CourseId" name="CourseId" class="form-select">
+            @foreach (var course in ViewBag.Courses as IEnumerable<SelectListItem>)
+            {
+                <option value="@course.Value">@course.Text</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label for="Content" class="form-label">Nội dung góp ý</label>
+        <textarea id="Content" name="Content" class="form-control" rows="3"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label for="Rating" class="form-label">Đánh giá</label>
+        <select id="Rating" name="Rating" class="form-select">
+            <option value="5">⭐⭐⭐⭐⭐ (Rất tốt)</option>
+            <option value="4">⭐⭐⭐⭐</option>
+            <option value="3">⭐⭐⭐</option>
+            <option value="2">⭐⭐</option>
+            <option value="1">⭐ (Kém)</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Gửi góp ý</button>
+</form>

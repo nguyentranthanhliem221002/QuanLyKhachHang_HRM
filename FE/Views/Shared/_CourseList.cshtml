@@ -1,0 +1,72 @@
+﻿@model dynamic
+@{
+    var grade = Model.grade ?? "10";
+}
+
+<div class="row g-4">
+    @foreach (var level in new[] { "Trung bình", "Khá", "Giỏi" })
+    {
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm border-0 rounded-3">
+                <div class="card-body">
+                    <h5 class="card-title text-primary fw-bold">@($"Khóa học lớp {grade} - {level}")</h5>
+                    <ul class="list-unstyled mt-3">
+                        <li>📘 Toán</li>
+                        <li>🔬 Vật lý</li>
+                        <li>⚗️ Hóa học</li>
+                        <li>🌿 Sinh học</li>
+                        <li>📝 Ngữ văn</li>
+                        <li>🎧 Luyện TOEIC</li>
+                        <li>💡 Kỹ năng mềm</li>
+                    </ul>
+                </div>
+                <div class="card-footer bg-transparent text-center d-flex justify-content-between">
+                    <button class="btn btn-outline-primary btn-sm">Đăng ký ngay</button>
+                    <button class="btn btn-success btn-sm" onclick="openSkillTestModal('@level', '@grade')">Thử năng lực</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Modal chọn môn học -->
+<div class="modal fade" id="skillTestModal-@grade" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4">
+            <div class="modal-header">
+                <h5 class="modal-title">🧠 Kiểm tra năng lực học sinh</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Chọn môn bạn muốn kiểm tra:</p>
+                <select id="subjectSelect" class="form-select mb-3">
+                    <option>Toán</option>
+                    <option>Vật lý</option>
+                    <option>Hóa học</option>
+                    <option>Sinh học</option>
+                    <option>Ngữ văn</option>
+                </select>
+                <button class="btn btn-primary w-100" onclick="startTest()">Bắt đầu kiểm tra</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let selectedLevel = "";
+    let selectedGrade = "";
+
+    function openSkillTestModal(level, grade) {
+        selectedLevel = level;
+        selectedGrade = grade;
+        const modal = new bootstrap.Modal(document.getElementById(`skillTestModal-${grade}`));
+        modal.show();
+    }
+
+    function startTest() {
+        const subject = document.getElementById("subjectSelect").value;
+        if (!subject) return alert("Vui lòng chọn môn học!");
+        window.location.href = `/Test/Start?subject=${subject}&level=${selectedLevel}&grade=${selectedGrade}`;
+    }
+
+</script>

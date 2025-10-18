@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "About Page";
+}
+
+<div class="container mt-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold text-primary">
+            <i class="bi bi-info-circle-fill me-2"></i>Về chúng tôi
+        </h2>
+        <p class="text-muted">Tìm hiểu thêm về hệ thống và mục tiêu phát triển của chúng tôi.</p>
+    </div>
+
+    <div class="row align-items-center">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+@*             <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="img-fluid rounded-4 shadow" alt="About Image" />
+ *@
+            <img src="~/images/Logo_SNAT.jpg" class="img-fluid rounded-4 shadow" alt="About Image" />
+        </div>
+
+        <div class="col-lg-6">
+            <h4 class="fw-semibold text-dark mb-3">Sứ mệnh của chúng tôi</h4>
+            <p class="text-muted">
+                Hệ thống được xây dựng với mục tiêu mang lại trải nghiệm tiện lợi và an toàn nhất cho người dùng.
+                Chúng tôi luôn đặt **trải nghiệm người dùng** lên hàng đầu, đảm bảo tính **bảo mật**, **hiệu năng cao**,
+                và **tính mở rộng** cho tương lai.
+            </p>
+
+            <h4 class="fw-semibold text-dark mb-3 mt-4">Tầm nhìn</h4>
+            <p class="text-muted">
+                Trở thành nền tảng quản lý hàng đầu trong lĩnh vực <b>dịch vụ và thương mại điện tử</b>,
+                giúp doanh nghiệp vận hành hiệu quả, tiết kiệm thời gian và chi phí.
+            </p>
+
+            <div class="mt-4">
+                <a class="btn btn-primary rounded-3" asp-controller="Home" asp-action="Contact">
+                    <i class="bi bi-chat-dots-fill me-1"></i>Liên hệ ngay
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

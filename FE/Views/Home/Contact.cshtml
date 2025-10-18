@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["Title"] = "Contact Page";
+}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4 fw-bold text-primary">
+        <i class="bi bi-envelope-paper-fill me-2"></i>Liên hệ với chúng tôi
+    </h2>
+    <p class="text-center text-muted mb-5">
+        Nếu bạn có bất kỳ thắc mắc hoặc góp ý nào, vui lòng điền vào biểu mẫu bên dưới.
+        Chúng tôi sẽ phản hồi sớm nhất có thể.
+    </p>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-body p-4">
+                    <form>
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-semibold">Họ và tên</label>
+                            <input type="text" class="form-control" id="name" placeholder="Nguyễn Văn A" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold">Email</label>
+                            <input type="email" class="form-control" id="email" placeholder="example@gmail.com" required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="message" class="form-label fw-semibold">Nội dung</label>
+                            <textarea class="form-control" id="message" rows="4" placeholder="Nhập nội dung tại đây..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 rounded-3">
+                            <i class="bi bi-send-fill me-2"></i>Gửi liên hệ
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <p><i class="bi bi-telephone-fill text-primary me-2"></i><strong>Hotline:</strong> 0283 8364 748</p>
+                <p><i class="bi bi-geo-alt-fill text-danger me-2"></i><strong>Địa chỉ:</strong> Khu dân cư, Nhà Bè, Thành phố Hồ Chí Minh, Việt Nam</p>
+                <p><i class="bi bi-clock-fill text-success me-2"></i><strong>Giờ làm việc:</strong> 8h00 - 16h00 (Thứ 2 - Thứ 6)</p>
+            </div>
+        </div>
+    </div>
+</div>

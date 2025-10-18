@@ -1,0 +1,28 @@
+﻿@model FE.Models.StudentViewModel
+@{
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+}
+
+<h2>Khóa học của tôi</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Tên khóa học</th>
+            <th>Giảng viên</th>
+            <th>Thời gian</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var course in Model.MyCourses)
+        {
+            <tr>
+                <td>@course.Name</td>
+                <td>@course.TeacherName</td>
+                <td>@course.StartDate.ToShortDateString() - @course.EndDate.ToShortDateString()</td>
+                <td><a href="#" class="btn btn-primary btn-sm">Xem chi tiết</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
