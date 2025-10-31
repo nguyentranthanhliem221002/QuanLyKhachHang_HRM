@@ -17,11 +17,14 @@
         <h4 class="text-center mt-3">Admin Panel</h4>
         <hr />
         <a href="/Admin/Dashboard">🏠 Dashboard</a>
-        <a href="#">👤 Quản lý người dùng</a>
-        <a href="#">📘 Quản lý khóa học</a>
+        <a asp-controller = "Admin" asp-action="Dashboard">👤 Quản lý người dùng</a>
+        <a asp-controller="Admin" asp-action="ManageCourses">📘 Quản lý khóa học</a>
+        <a asp-controller="Admin" asp-action="ManageStudents">📘 Quản lý học viên</a>
+        <a asp-controller="Admin" asp-action="ManageEmployees">📘 Quản lý giáo viên</a>
+        <a  asp-controller="Admin" asp-action="ManagePayments">📘 Quản lý hóa đơn</a>
         <a href="#">🧾 Quản lý báo cáo</a>
-        <a href="#">💬 Phản hồi</a>
-        <a href="#">⚙️ Cài đặt</a>
+        <a  asp-controller="Admin" asp-action="Reports">💬 Phản hồi</a>
+        <a >⚙️ Cài đặt</a>
         <hr />
         <a href="/Home/Index" class="text-danger">⬅️ Quay về trang chính</a>
     </div>

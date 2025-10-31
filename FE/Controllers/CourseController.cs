@@ -1,20 +1,28 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using FE.Services;
+using FE.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace FE.Controllers
 {
     public class CourseController : Controller
     {
-        public IActionResult Index()
+        private readonly CourseService _service;
+
+        public CourseController(CourseService service)
         {
-            return View();
+            _service = service;
         }
-        public IActionResult Detail()
+
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var courses = await _service.GetAllCoursesAsync();
+            return View(courses);
         }
-        public IActionResult Enroll()
+
+        public async Task<IActionResult> Detail(int id)
         {
-            return View();
+            var course = await _service.GetCourseByIdAsync(id);
+            return View(course);
         }
     }
 }

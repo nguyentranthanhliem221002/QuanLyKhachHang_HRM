@@ -1,5 +1,5 @@
 ﻿using BE.Data;
-using FE.Models;
+using BE.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,7 +38,7 @@ namespace BE.Controllers
             return Ok(questions);
         }
         [HttpPost("Submit")]
-        public IActionResult Submit([FromBody] TestSubmitModel model)
+        public IActionResult Submit([FromBody] TestSubmit model)
         {
             var answers = model.Answers;
             var subject = model.Subject;

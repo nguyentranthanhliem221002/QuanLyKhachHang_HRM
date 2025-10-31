@@ -1,4 +1,12 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
+﻿// --- apiHelper.js ---
+// Helper gọi API chung (GET/POST/PUT/DELETE)
+async function callApi(url, method = "GET", data = null) {
+    const options = { method, headers: {} };
+    if (data) {
+        options.headers['Content-Type'] = 'application/json';
+        options.body = JSON.stringify(data);
+    }
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error(`Lỗi API: ${res.status}`);
+    return method === "GET" ? await res.json() : true;
+}

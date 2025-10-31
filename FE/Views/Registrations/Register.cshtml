@@ -1,0 +1,78 @@
+﻿@model RegistrationViewModel
+
+<h2 class="mb-4 text-center text-primary">Đăng ký khóa học lớp @Model.Grade - @Model.Level</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+<form asp-action="Register" method="post" class="mx-auto shadow-lg p-4 bg-white rounded-4" style="max-width: 500px;">
+    <input type="hidden" asp-for="Grade" />
+    <input type="hidden" asp-for="Level" />
+
+    <div class="mb-3">
+        <label asp-for="FullName" class="form-label fw-bold"></label>
+        <input asp-for="FullName" class="form-control" placeholder="Nhập họ và tên" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label fw-bold"></label>
+        <input asp-for="Email" class="form-control" placeholder="Nhập email" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Phone" class="form-label fw-bold"></label>
+        <input asp-for="Phone" class="form-control" placeholder="Nhập số điện thoại" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Gender" class="form-label fw-bold"></label>
+        <select asp-for="Gender" class="form-control">
+            <option value="0">Nam</option>
+            <option value="1">Nữ</option>
+            <option value="2">Khác</option>
+        </select>
+        <span asp-validation-for="Gender" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="DateOfBirth" class="form-label fw-bold"></label>
+        <input asp-for="DateOfBirth" class="form-control" type="date" />
+        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success w-100 mt-3">Đăng ký</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const success = '@TempData["Success"]';
+        const error = '@TempData["Error"]';
+
+        if (success) {
+            Swal.fire({
+                icon: 'success',
+                title: success,
+                confirmButtonColor: '#198754'
+            });
+        }
+
+        if (error) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Đăng ký thất bại',
+                text: error
+            });
+        }
+    </script>
+}

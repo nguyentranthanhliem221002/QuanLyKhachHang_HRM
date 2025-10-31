@@ -1,5 +1,253 @@
 ﻿@{
-    ViewData["Title"] = "ManageCourses Page";
+    ViewData["Title"] = "Manage Courses Page";
 }
 
+<h2 class="mb-4">Danh sách khóa học</h2>
 
+<div class="mb-3 d-flex gap-2 flex-wrap">
+    <button class="btn btn-success" onclick="openAddModal()">Thêm khóa học</button>
+
+    <input type="text" id="searchCourse" class="form-control w-auto" placeholder="Tìm kiếm theo tên khóa học..." />
+
+    <select id="filterGrade" class="form-select w-auto">
+        <option value="">Tất cả lớp</option>
+        <option value="10">10</option>
+        <option value="11">11</option>
+        <option value="12">12</option>
+    </select>
+
+    <select id="filterLevel" class="form-select w-auto">
+        <option value="">Tất cả mức học</option>
+        <option value="Trung bình">Trung bình</option>
+        <option value="Khá">Khá</option>
+        <option value="Giỏi">Giỏi</option>
+    </select>
+
+    <select id="filterSubject" class="form-select w-auto">
+        <option value="">Tất cả môn học</option>
+        <option value="Toán">Toán</option>
+        <option value="Vật lý">Vật lý</option>
+        <option value="Hóa học">Hóa học</option>
+        <option value="Sinh học">Sinh học</option>
+        <option value="Ngữ văn">Ngữ văn</option>
+    </select>
+</div>
+
+<table class="table table-bordered table-striped" id="coursesTable">
+    <thead class="table-primary">
+        <tr>
+            <th>#</th>
+            <th>Tên khóa học</th>
+            <th>Lớp</th>
+            <th>Mức học</th>
+            <th>Môn học</th>
+            <th>Giá</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<!-- Modal Thêm/Sửa khóa học -->
+<div class="modal fade" id="courseModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm/Sửa khóa học</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="courseForm">
+                    <input type="hidden" id="courseId" value="0" />
+                    <div class="mb-3">
+                        <label>Tên khóa học</label>
+                        <input type="text" id="courseTitle" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>Lớp</label>
+                        <select id="courseGrade" class="form-select" required>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Mức học</label>
+                        <select id="courseLevel" class="form-select" required>
+                            <option value="Trung bình">Trung bình</option>
+                            <option value="Khá">Khá</option>
+                            <option value="Giỏi">Giỏi</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Môn học</label>
+                        <select id="courseSubject" class="form-select" required>
+                            <option value="1">Toán</option>
+                            <option value="2">Vật lý</option>
+                            <option value="3">Hóa học</option>
+                            <option value="4">Sinh học</option>
+                            <option value="5">Ngữ văn</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Giá</label>
+                        <input type="number" id="courseFee" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>Mô tả</label>
+                        <textarea id="courseDescription" class="form-control"></textarea>
+                    </div>
+                    <div class="mb-3 d-flex gap-2">
+                        <div>
+                            <label>Ngày bắt đầu</label>
+                            <input type="date" id="courseStart" class="form-control" />
+                        </div>
+                        <div>
+                            <label>Ngày kết thúc</label>
+                            <input type="date" id="courseEnd" class="form-control" />
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Lưu</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/api.js"></script>
+    <script>
+        const apiUrl = "https://localhost:51745/api/course";
+
+        // --- Hiển thị danh sách khóa học ---
+        function renderCourses(list) {
+            const tbody = document.querySelector('#coursesTable tbody');
+            tbody.innerHTML = '';
+            list.forEach((c, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${c.title}</td>
+                    <td>${c.grade}</td>
+                    <td>${c.level}</td>
+                    <td>${c.subjectName ?? ''}</td>
+                    <td>${c.fee?.toLocaleString('vi-VN')} đ</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="editCourse(${c.id})">Sửa</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCourse(${c.id})">Xóa</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // --- Tải danh sách khóa học ---
+        async function loadCourses() {
+            const query = new URLSearchParams({
+                search: document.getElementById('searchCourse').value.trim(),
+                grade: document.getElementById('filterGrade').value,
+                level: document.getElementById('filterLevel').value,
+                subject: document.getElementById('filterSubject').value
+            });
+
+            try {
+                const courses = await callApi(`${apiUrl}?${query.toString()}`);
+                renderCourses(courses);
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Lỗi tải dữ liệu', text: err.message });
+            }
+        }
+
+        // --- Mở modal thêm mới ---
+        function openAddModal() {
+            document.getElementById('courseForm').reset();
+            document.getElementById('courseId').value = 0;
+            new bootstrap.Modal(document.getElementById('courseModal')).show();
+        }
+
+        // --- Chỉnh sửa khóa học ---
+        async function editCourse(id) {
+            try {
+                const c = await callApi(`${apiUrl}/${id}`);
+                document.getElementById('courseId').value = c.id;
+                document.getElementById('courseTitle').value = c.title;
+                document.getElementById('courseGrade').value = c.grade;
+                document.getElementById('courseLevel').value = c.level;
+                document.getElementById('courseSubject').value = c.subjectId;
+                document.getElementById('courseFee').value = c.fee;
+                document.getElementById('courseDescription').value = c.description;
+                if (c.startDate) document.getElementById('courseStart').value = c.startDate.split('T')[0];
+                if (c.endDate) document.getElementById('courseEnd').value = c.endDate.split('T')[0];
+                new bootstrap.Modal(document.getElementById('courseModal')).show();
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Không tìm thấy khóa học', text: err.message });
+            }
+        }
+
+        // --- Xóa khóa học ---
+        async function deleteCourse(id) {
+            const confirm = await Swal.fire({
+                icon: 'warning',
+                title: 'Bạn có chắc muốn xóa?',
+                showCancelButton: true,
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy'
+            });
+            if (!confirm.isConfirmed) return;
+
+            try {
+                await callApi(`${apiUrl}/${id}`, "DELETE");
+                loadCourses();
+                Swal.fire({ icon: 'success', title: 'Xóa thành công!', timer: 1500, toast: true, position: 'top-end', showConfirmButton: false });
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Xóa thất bại', text: err.message });
+            }
+        }
+
+        // --- Submit thêm/sửa ---
+        document.getElementById('courseForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const id = parseInt(document.getElementById('courseId').value);
+            const payload = {
+                Title: document.getElementById('courseTitle').value,
+                Grade: document.getElementById('courseGrade').value,
+                Level: document.getElementById('courseLevel').value,
+                SubjectId: parseInt(document.getElementById('courseSubject').value),
+                Fee: parseFloat(document.getElementById('courseFee').value || '0'),
+                Description: document.getElementById('courseDescription').value,
+                StartDate: document.getElementById('courseStart').value,
+                EndDate: document.getElementById('courseEnd').value
+            };
+
+            const method = id > 0 ? "PUT" : "POST";
+            const url = id > 0 ? `${apiUrl}/${id}` : apiUrl;
+
+            try {
+                await callApi(url, method, payload);
+                bootstrap.Modal.getInstance(document.getElementById('courseModal')).hide();
+                loadCourses();
+                Swal.fire({
+                    icon: 'success',
+                    title: id > 0 ? 'Cập nhật thành công!' : 'Thêm thành công!',
+                    timer: 1500,
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false
+                });
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Lưu thất bại', text: err.message });
+            }
+        });
+
+        // --- Gắn sự kiện tìm kiếm / lọc ---
+        ['searchCourse', 'filterGrade', 'filterLevel', 'filterSubject'].forEach(id => {
+            const el = document.getElementById(id);
+            const event = id === 'searchCourse' ? 'input' : 'change';
+            el.addEventListener(event, loadCourses);
+        });
+
+        // --- Load dữ liệu ban đầu ---
+        loadCourses();
+    </script>
+}

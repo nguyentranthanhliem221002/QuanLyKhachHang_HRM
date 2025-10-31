@@ -9,6 +9,6 @@
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public string Room { get; set; }
-        public string Instructor { get; set; } // Hoặc liên kết đến Employee
+        public string Instructor { get; set; } 
     }
 }

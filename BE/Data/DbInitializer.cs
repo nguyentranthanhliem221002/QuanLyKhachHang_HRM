@@ -1,29 +1,100 @@
-﻿using BE.Model;
-using BE.Models;
+﻿using BE.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BE.Data
 {
-    public class DbInitializer
+    public static class DbInitializer
     {
-        public static void Initialize(ApplicationDbContext context)
+        public static async Task InitializeAsync(
+            ApplicationDbContext context,
+            UserManager<User> userManager,
+            RoleManager<IdentityRole<Guid>> roleManager)
         {
-            context.Database.EnsureCreated();
 
-            // ✅ Seed Users
-            if (!context.Users.Any())
+
+            // =======================
+            // 1️⃣ Seed Roles
+            // =======================
+            string[] roles = { "Admin", "Teacher", "Student" };
+            foreach (var role in roles)
             {
-                var users = new List<User>
-                {
-                    new User { UserName = "admin", Password = "admin123", Role = "Admin", FullName="Admin System", Email="admin@local" },
-                    new User { UserName = "teacher1", Password = "teach123", Role = "Teacher", FullName="Thầy A", Email="teacher@local" },
-                    new User { UserName = "student1", Password = "stud123", Role = "Student", FullName="Sinh Viên A", Email="student@local" }
-                };
-                context.Users.AddRange(users);
-                context.SaveChanges();
+                if (!await roleManager.RoleExistsAsync(role))
+                    await roleManager.CreateAsync(new IdentityRole<Guid>(role));
             }
 
-            // ✅ Seed Subjects
-            if (!context.Subjects.Any())
+            // =======================
+            // 2️⃣ Seed Users + Profiles
+            // =======================
+            if (!await userManager.Users.AnyAsync())
+            {
+                var users = new List<(string username, string email, string fullname, string password, string role)>
+                {
+                    ("admin", "admin@local", "Admin System", "Admin123!", "Admin"),
+                    ("teacher1", "teacher@local", "Thầy A", "Teach123!", "Teacher"),
+                    ("student1", "student@local", "Sinh viên A", "Stud123!", "Student")
+                };
+
+                foreach (var (username, email, fullname, password, role) in users)
+                {
+                    var user = new User
+                    {
+                        UserName = username,
+                        Email = email,
+                        FullName = fullname,
+                        EmailConfirmed = true,
+                        IsActive = true,
+                        RoleType = role
+                    };
+
+                    var result = await userManager.CreateAsync(user, password);
+                    if (!result.Succeeded)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"❌ Lỗi tạo user '{username}': {string.Join(", ", result.Errors.Select(e => e.Description))}");
+                        Console.ResetColor();
+                        continue;
+                    }
+
+                    await userManager.AddToRoleAsync(user, role);
+
+                    if (role == "Teacher")
+                    {
+                        var employee = new Employee
+                        {
+                            UserId = user.Id,
+                            Phone = "0123456789",
+                            Position = "Giáo viên Toán",
+                            Level = "Senior",
+                            Salary = 1500,
+                            DateOfJoining = DateTime.Now,
+                            Status = 0
+                        };
+                        context.Employees.Add(employee);
+                    }
+                    else if (role == "Student")
+                    {
+                        var student = new Student
+                        {
+                            UserId = user.Id,
+                            StudentCode = "SV001",
+                            ClassName = "10A1",
+                            EnrollmentDate = DateTime.Now,
+                            Status = 0
+                        };
+                        context.Students.Add(student);
+                    }
+
+                    Console.WriteLine($"✅ Tạo user '{username}' với role '{role}' thành công.");
+                }
+
+                await context.SaveChangesAsync();
+            }
+
+            // =======================
+            // 3️⃣ Seed Subjects
+            // =======================
+            if (!await context.Subjects.AnyAsync())
             {
                 var subjects = new List<Subject>
                 {
@@ -32,54 +103,83 @@ namespace BE.Data
                     new Subject { Name = "Hóa học" },
                     new Subject { Name = "Sinh học" },
                     new Subject { Name = "Ngữ văn" },
-                    new Subject { Name = "Kỹ năng mềm" } // Không tạo câu hỏi
+                    new Subject { Name = "Kỹ năng mềm" }
                 };
-                context.Subjects.AddRange(subjects);
-                context.SaveChanges();
+
+                await context.Subjects.AddRangeAsync(subjects);
+                await context.SaveChangesAsync();
+                Console.WriteLine("✅ Đã seed dữ liệu môn học.");
             }
 
-            // ✅ Seed Questions (mỗi môn 20 câu, trừ kỹ năng mềm)
-            if (!context.Questions.Any())
+            // =======================
+            // 4️⃣ Seed Questions
+            // =======================
+            if (!await context.Questions.AnyAsync())
             {
-                int questionId = 1;
-                for (int subjectId = 1; subjectId <= 5; subjectId++)
+                var subjects = await context.Subjects
+                    .Where(s => s.Name != "Kỹ năng mềm")
+                    .ToListAsync();
+
+                foreach (var subject in subjects)
                 {
                     for (int i = 1; i <= 20; i++)
                     {
-                        string subjectName = subjectId switch
+                        await context.Questions.AddAsync(new Question
                         {
-                            1 => "Toán",
-                            2 => "Vật lý",
-                            3 => "Hóa học",
-                            4 => "Sinh học",
-                            5 => "Ngữ văn",
-                            _ => ""
-                        };
-
-                        string content = subjectName switch
-                        {
-                            "Toán" => $"{i}. 1 + {i} = ?",
-                            "Vật lý" => $"{i}. Vận tốc vật thể thứ {i} là bao nhiêu?",
-                            "Hóa học" => $"{i}. Nguyên tố hóa học số {i} là gì?",
-                            "Sinh học" => $"{i}. Câu hỏi sinh học số {i} liên quan đến tế bào",
-                            "Ngữ văn" => $"{i}. Trong văn bản số {i}, tác giả nhấn mạnh điều gì?",
-                            _ => ""
-                        };
-                        context.Questions.Add(new Question
-                        {
-                            SubjectId = subjectId,
-                            Content = content,
+                            SubjectId = subject.Id,
+                            Content = $"{i}. Câu hỏi {subject.Name} số {i}",
                             OptionA = "A",
                             OptionB = "B",
                             OptionC = "C",
                             OptionD = "D",
                             CorrectAnswer = "B"
                         });
-
                     }
                 }
-                context.SaveChanges();
+
+                await context.SaveChangesAsync();
+                Console.WriteLine("✅ Đã seed dữ liệu câu hỏi.");
             }
+
+            // =======================
+            // 5️⃣ Seed Courses
+            // =======================
+            if (!await context.Courses.AnyAsync())
+            {
+                var subjects = await context.Subjects.ToListAsync();
+
+                var courses = new List<Course>();
+
+                foreach (var subject in subjects)
+                {
+                    courses.Add(new Course
+                    {
+                        Title = $"Khóa {subject.Name} Cơ Bản",
+                        Description = $"Khóa học nền tảng cho môn {subject.Name}, phù hợp học sinh phổ thông.",
+                        Fee = 1000000m,
+                        StartDate = DateTime.Now.AddDays(-7),
+                        EndDate = DateTime.Now.AddMonths(2),
+                        SubjectId = subject.Id
+                    });
+
+                    courses.Add(new Course
+                    {
+                        Title = $"Khóa {subject.Name} Nâng Cao",
+                        Description = $"Khóa học nâng cao kiến thức chuyên sâu môn {subject.Name}.",
+                        Fee = 1500000m,
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddMonths(3),
+                        SubjectId = subject.Id
+                    });
+                }
+
+                await context.Courses.AddRangeAsync(courses);
+                await context.SaveChangesAsync();
+
+                Console.WriteLine("✅ Đã seed dữ liệu Courses (khóa học).");
+            }
+
+            Console.WriteLine("✅ Seed dữ liệu ban đầu hoàn tất (không xóa dữ liệu cũ).");
         }
     }
 }

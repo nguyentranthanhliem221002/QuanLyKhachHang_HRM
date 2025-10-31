@@ -1,28 +1,36 @@
 ﻿@model FE.Models.StudentViewModel
 @{
     Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    ViewData["Title"] = "Khóa học của tôi";
 }
 
-<h2>Khóa học của tôi</h2>
+<h2 class="mb-4">Khóa học của tôi</h2>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Tên khóa học</th>
-            <th>Giảng viên</th>
-            <th>Thời gian</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var course in Model.MyCourses)
-        {
+@if (Model.MyCourses != null && Model.MyCourses.Any())
+{
+    <table class="table table-striped">
+        <thead>
             <tr>
-                <td>@course.Name</td>
-                <td>@course.TeacherName</td>
-                <td>@course.StartDate.ToShortDateString() - @course.EndDate.ToShortDateString()</td>
-                <td><a href="#" class="btn btn-primary btn-sm">Xem chi tiết</a></td>
+                <th>Tên khóa học</th>
+                <th>Giảng viên</th>
+                <th>Thời gian</th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var course in Model.MyCourses)
+            {
+                <tr>
+                    <td>@course.Title</td>
+                    <td>@course.SubjectName</td>
+                    <td>@course.StartDate.ToString("dd/MM/yyyy") - @course.EndDate.ToString("dd/MM/yyyy")</td>
+                    <td><a href="#" class="btn btn-primary btn-sm">Xem chi tiết</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Hiện bạn chưa đăng ký khóa học nào.</p>
+}

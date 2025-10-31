@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\EmployeeService.cs" />
+    <Compile Remove="Services\StudentService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Update="appsettings_Production.Development.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>

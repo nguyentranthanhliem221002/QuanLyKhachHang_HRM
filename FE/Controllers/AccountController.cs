@@ -2,101 +2,97 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using FE.Services;
 
 namespace FE.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IHttpClientFactory _factory;
-        public AccountController(IHttpClientFactory factory) => _factory = factory;
+        private readonly AccountService _accountService;
+        public AccountController(AccountService accountService) => _accountService = accountService;
 
         [HttpGet]
         public IActionResult Login() => View();
-        public IActionResult AccessDenied() => View();
-        [Authorize]
-        public async Task<IActionResult> Logout()
-        {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            // Xoá danh tính người dùng hiện tại ngay lập tức
-            HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity());
-
-            // Chuyển hướng về trang chủ
-            return RedirectToAction("Index", "Home");
-        }
+        [HttpGet]
+        public IActionResult Register() => View();
 
         [HttpPost]
-        public async Task<IActionResult> Login(UserViewModel model)
+        public async Task<IActionResult> Register(UserViewModel model)
         {
             if (!ModelState.IsValid)
                 return View(model);
 
-            var client = _factory.CreateClient("BE");
-            var response = await client.PostAsJsonAsync("api/auth/login", new
+            var message = await _accountService.RegisterAsync(model);
+
+            if (string.IsNullOrEmpty(message))
+            {
+                ViewBag.Error = "Không thể đăng ký. Vui lòng thử lại.";
+                return View(model);
+            }
+
+            TempData["SuccessMessage"] = message;
+            return RedirectToAction("Login");
+        }
+
+        public IActionResult AccessDenied() => View();
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var result = await _accountService.LoginAsync(new UserViewModel
             {
                 UserName = model.UserName,
                 Password = model.Password
             });
 
-            if (!response.IsSuccessStatusCode)
+            if (result == null)
             {
                 ViewBag.Error = "Tên đăng nhập hoặc mật khẩu không đúng!";
                 return View(model);
             }
 
-            var result = await response.Content.ReadFromJsonAsync<LoginResult>();
-            if (result == null)
-            {
-                ViewBag.Error = "Không nhận được phản hồi hợp lệ từ máy chủ!";
-                return View(model);
-            }
+            string username = result.username ?? "UnknownUser";
+            string role = string.IsNullOrEmpty(result.role) ? "User" : result.role;
 
-            // ✅ Tạo Claims
             var claims = new List<Claim>
     {
-        new Claim(ClaimTypes.Name, result.username),
-        new Claim(ClaimTypes.Role, result.role)
+        new Claim(ClaimTypes.Name, username),
+        new Claim(ClaimTypes.Role, role)
     };
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
 
-            // ✅ Cấu hình cookie (tùy chọn)
-            var authProperties = new AuthenticationProperties
-            {
-                IsPersistent = true, // Giữ cookie nếu user không logout
-                ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
-            };
-
-            // ✅ Đăng nhập và tạo cookie
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(claimsIdentity),
-                authProperties);
+                principal,
+                new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
+                }
+            );
 
-            // ✅ Điều hướng theo role
-            return result.role switch
+            return role switch
             {
                 "Admin" => RedirectToAction("Dashboard", "Admin"),
-                "Teacher" => RedirectToAction("Dashboard", "Teacher"),
+                "Teacher" => RedirectToAction("Dashboard", "Employee"),
                 "Student" => RedirectToAction("Dashboard", "Student"),
                 _ => RedirectToAction("Index", "Home")
             };
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> Logout()
-        //{
-        //    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        //    return RedirectToAction("Login");
-        //}
-
-        private class LoginResult
+        [Authorize]
+        public async Task<IActionResult> Logout()
         {
-            public string username { get; set; } = null!;
-            public string role { get; set; } = null!;
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity()); // reset danh tính
+            return RedirectToAction("Login", "Account");
         }
     }
 }

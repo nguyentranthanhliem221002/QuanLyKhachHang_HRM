@@ -11,7 +11,7 @@
         <div class="card text-white bg-primary mb-3">
             <div class="card-header">Tổng số sinh viên</div>
             <div class="card-body">
-                <h5 class="card-title">1,240</h5>
+                <h5 class="card-title">@ViewBag.TotalStudents</h5>
                 <p class="card-text">Sinh viên đang hoạt động trong hệ thống.</p>
             </div>
         </div>
@@ -21,7 +21,7 @@
         <div class="card text-white bg-success mb-3">
             <div class="card-header">Tổng số giảng viên</div>
             <div class="card-body">
-                <h5 class="card-title">58</h5>
+                <h5 class="card-title">@ViewBag.TotalTeachers</h5>
                 <p class="card-text">Giảng viên đã được phân công giảng dạy.</p>
             </div>
         </div>
@@ -31,18 +31,9 @@
         <div class="card text-white bg-warning mb-3">
             <div class="card-header">Khóa học đang mở</div>
             <div class="card-body">
-                <h5 class="card-title">12</h5>
+                <h5 class="card-title">@ViewBag.TotalCourses</h5>
                 <p class="card-text">Khóa học hiện đang trong kỳ học này.</p>
             </div>
         </div>
     </div>
-</div>
-
-<div class="mt-4">
-    <h4>Chức năng nhanh:</h4>
-    <ul>
-        <li><a href="#">Quản lý người dùng</a></li>
-        <li><a href="#">Quản lý khóa học</a></li>
-        <li><a href="#">Quản lý phản hồi</a></li>
-    </ul>
 </div>

@@ -3,6 +3,32 @@
     var grade = Model.grade ?? "10";
 }
 
+<!-- ✅ Modal thông báo đăng nhập -->
+<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="authModalLabel">
+                    <i class="bi bi-person-lock me-2"></i>Yêu cầu xác thực
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p class="fs-5">Bạn chưa đăng nhập. Vui lòng chọn hành động:</p>
+                <div class="d-flex justify-content-center gap-3 mt-3">
+                    <a href="/Account/Login" class="btn btn-primary px-4">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Đăng nhập
+                    </a>
+                    <a href="/Account/Register" class="btn btn-outline-primary px-4">
+                        <i class="bi bi-person-plus me-1"></i>Đăng ký tài khoản
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ✅ Danh sách khóa học -->
 <div class="row g-4">
     @foreach (var level in new[] { "Trung bình", "Khá", "Giỏi" })
     {
@@ -21,7 +47,10 @@
                     </ul>
                 </div>
                 <div class="card-footer bg-transparent text-center d-flex justify-content-between">
-                    <button class="btn btn-outline-primary btn-sm">Đăng ký ngay</button>
+                    <button class="btn btn-outline-primary btn-sm"
+                            onclick="openRegistrationForm('@grade', '@level')">
+                        Đăng ký ngay
+                    </button>
                     <button class="btn btn-success btn-sm" onclick="openSkillTestModal('@level', '@grade')">Thử năng lực</button>
                 </div>
             </div>
@@ -29,7 +58,7 @@
     }
 </div>
 
-<!-- Modal chọn môn học -->
+<!-- ✅ Modal chọn môn học -->
 <div class="modal fade" id="skillTestModal-@grade" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4">
@@ -52,6 +81,7 @@
     </div>
 </div>
 
+<!-- ✅ Scripts -->
 <script>
     let selectedLevel = "";
     let selectedGrade = "";
@@ -69,4 +99,17 @@
         window.location.href = `/Test/Start?subject=${subject}&level=${selectedLevel}&grade=${selectedGrade}`;
     }
 
+    // ✅ Lấy trạng thái đăng nhập từ Razor
+    const isAuthenticated = @(User.Identity.IsAuthenticated.ToString().ToLower());
+
+    function openRegistrationForm(grade, level) {
+        if (!isAuthenticated) {
+            // ❌ Nếu chưa đăng nhập → bật modal yêu cầu xác thực
+            const modal = new bootstrap.Modal(document.getElementById('authModal'));
+            modal.show();
+        } else {
+            // ✅ Nếu đã đăng nhập → đi đến trang đăng ký khóa học
+            window.location.href = `/Registrations/Register?grade=${grade}&level=${level}`;
+        }
+    }
 </script>

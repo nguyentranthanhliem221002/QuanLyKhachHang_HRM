@@ -1,4 +1,246 @@
 ﻿@{
-    ViewData["Title"] = "ManageEmployees Page";
+    ViewData["Title"] = "Manage Employees Page";
 }
 
+<h2 class="mb-4">Danh sách nhân viên</h2>
+
+<div class="mb-3 d-flex gap-2 flex-wrap">
+    <button class="btn btn-success" onclick="addEmployee()">Thêm nhân viên</button>
+
+    <input type="text" id="searchEmployee" class="form-control w-auto" placeholder="Tìm kiếm nhân viên theo tên, email, SĐT..." />
+
+    <select id="filterPosition" class="form-select w-auto">
+        <option value="">Tất cả chức vụ</option>
+        <option value="Giảng viên">Giảng viên</option>
+        <option value="Trợ giảng">Trợ giảng</option>
+        <option value="Quản lý">Quản lý</option>
+        <option value="Hành chính">Hành chính</option>
+        <option value="Kế toán">Kế toán</option>
+    </select>
+
+    <select id="filterLevel" class="form-select w-auto">
+        <option value="">Tất cả mức</option>
+        <option value="Junior">Junior</option>
+        <option value="Middle">Middle</option>
+        <option value="Senior">Senior</option>
+    </select>
+
+    <select id="filterStatus" class="form-select w-auto">
+        <option value="">Tất cả trạng thái</option>
+        <option value="Active">Active</option>
+        <option value="Inactive">Inactive</option>
+    </select>
+</div>
+
+<table class="table table-bordered table-striped" id="employeesTable">
+    <thead class="table-primary">
+        <tr>
+            <th>#</th>
+            <th>Họ và tên</th>
+            <th>Email</th>
+            <th>SĐT</th>
+            <th>Chức vụ</th>
+            <th>Mức</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<!-- Modal Thêm/Sửa nhân viên -->
+<div class="modal fade" id="employeeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm/Sửa nhân viên</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="employeeForm">
+                    <input type="hidden" id="empIndex" value="-1" />
+                    <div class="mb-3">
+                        <label>Họ và tên</label>
+                        <input type="text" id="empFullName" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>Email</label>
+                        <input type="email" id="empEmail" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>SĐT</label>
+                        <input type="text" id="empPhone" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label>Chức vụ</label>
+                        <select id="empPosition" class="form-select" required>
+                            <option value="Giảng viên">Giảng viên</option>
+                            <option value="Trợ giảng">Trợ giảng</option>
+                            <option value="Quản lý">Quản lý</option>
+                            <option value="Hành chính">Hành chính</option>
+                            <option value="Kế toán">Kế toán</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Mức</label>
+                        <select id="empLevel" class="form-select" required>
+                            <option value="Junior">Junior</option>
+                            <option value="Middle">Middle</option>
+                            <option value="Senior">Senior</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Trạng thái</label>
+                        <select id="empStatus" class="form-select" required>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Lưu</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="~/js/api.js"></script> <!-- include api.js -->
+    <script>
+        const apiUrl = "https://localhost:51745/api/users/employees";
+
+
+        // --- Render bảng nhân viên ---
+        function renderEmployees(list) {
+            const tbody = document.querySelector('#employeesTable tbody');
+            tbody.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+
+            list.forEach((emp, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td>${emp.fullName}</td>
+                            <td>${emp.email}</td>
+                            <td>${emp.phone}</td>
+                            <td>${emp.position}</td>
+                            <td>${emp.level || ""}</td>
+                            <td>${emp.status == 1 ? "Active" : "Inactive"}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="editEmployee('${emp.id}')">Sửa</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteEmployee('${emp.id}')">Xóa</button>
+                            </td>
+                        `;
+                fragment.appendChild(tr);
+            });
+            tbody.appendChild(fragment);
+        }
+
+        // --- Load dữ liệu filter/search ---
+        async function loadEmployees() {
+            const query = new URLSearchParams({
+                search: document.getElementById('searchEmployee').value.trim(),
+                position: document.getElementById('filterPosition').value,
+                level: document.getElementById('filterLevel').value,
+                status: document.getElementById('filterStatus').value
+            });
+            try {
+                const employees = await callApi(`${apiUrl}?${query.toString()}`);
+                renderEmployees(employees);
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Lỗi tải dữ liệu', text: err.message });
+            }
+        }
+
+        // --- Thêm nhân viên ---
+        function addEmployee() {
+            document.getElementById('employeeForm').reset();
+            document.getElementById('empIndex').value = "-1";
+            new bootstrap.Modal(document.getElementById('employeeModal')).show();
+        }
+
+        // --- Sửa nhân viên ---
+        async function editEmployee(id) {
+            try {
+                const emp = await callApi(`${apiUrl}/${id}`);
+                document.getElementById('empIndex').value = emp.id;
+                document.getElementById('empFullName').value = emp.fullName;
+                document.getElementById('empEmail').value = emp.email;
+                document.getElementById('empPhone').value = emp.phone;
+                document.getElementById('empPosition').value = emp.position;
+                document.getElementById('empLevel').value = emp.level || "";
+                document.getElementById('empStatus').value = emp.status == 1 ? "Active" : "Inactive";
+                new bootstrap.Modal(document.getElementById('employeeModal')).show();
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Không tìm thấy nhân viên', text: err.message });
+            }
+        }
+
+        // --- Xóa nhân viên ---
+        async function deleteEmployee(id) {
+            const result = await Swal.fire({
+                icon: 'warning',
+                title: 'Bạn có chắc muốn xóa?',
+                showCancelButton: true,
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true
+            });
+            if (result.isConfirmed) {
+                try {
+                    await callApi(`${apiUrl}/${id}`, "DELETE");
+                    loadEmployees();
+                    Swal.fire({ icon: 'success', title: 'Xóa thành công!', timer: 1500, toast: true, position: 'top-end', showConfirmButton: false });
+                } catch (err) {
+                    Swal.fire({ icon: 'error', title: 'Xóa thất bại', text: err.message });
+                }
+            }
+        }
+
+              document.getElementById('employeeForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const id = document.getElementById('empIndex').value;
+
+            // --- Chuẩn DTO trùng với BE ---
+            const empData = {
+                FullName: document.getElementById('empFullName').value,
+                Email: document.getElementById('empEmail').value,
+                Phone: document.getElementById('empPhone').value,
+                Position: document.getElementById('empPosition').value,
+                Salary: 0, // có thể chỉnh theo input nếu cần
+                Status: document.getElementById('empStatus').value === "Active" ? 1 : 0,
+                Level: document.getElementById('empLevel').value
+            };
+
+            const method = id && id != "-1" ? "PUT" : "POST";
+            const url = id && id != "-1" ? `${apiUrl}/${id}` : apiUrl;
+
+            try {
+                await callApi(url, method, empData);
+                new bootstrap.Modal(document.getElementById('employeeModal')).hide();
+                loadEmployees();
+                Swal.fire({
+                    icon: 'success',
+                    title: id && id != "-1" ? 'Cập nhật thành công!' : 'Thêm thành công!',
+                    timer: 1500,
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false
+                });
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Thao tác thất bại', text: err.message });
+            }
+        });
+
+
+        // --- Event filter & search ---
+        ['searchEmployee', 'filterPosition', 'filterLevel', 'filterStatus'].forEach(id => {
+            const el = document.getElementById(id);
+            const event = id === 'searchEmployee' ? 'input' : 'change';
+            el.addEventListener(event, loadEmployees);
+        });
+
+        // --- Load dữ liệu ban đầu ---
+        loadEmployees();
+    </script>
+}

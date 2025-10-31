@@ -1,0 +1,18 @@
+﻿@* @model FE.Models.RegistrationViewModel
+
+@{
+    ViewData["Title"] = "Đăng ký thành công";
+}
+
+<div class="container mt-5 text-center">
+    <h2 class="text-success">🎉 Đăng ký thành công!</h2>
+    <p>Bạn đã đăng ký khóa học lớp <strong>@Model.Grade - @Model.Level</strong> thành công.</p>
+    <p>Thông tin của bạn:</p>
+    <ul class="list-unstyled">
+        <li>Họ tên: @Model.FullName</li>
+        <li>Email: @Model.Email</li>
+        <li>Số điện thoại: @Model.Phone</li>
+    </ul>
+    <a href="/" class="btn btn-primary mt-3">Quay về trang chủ</a>
+</div>
+ *@

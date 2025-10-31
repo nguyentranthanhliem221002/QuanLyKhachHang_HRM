@@ -1,14 +1,15 @@
 ﻿using FE.Models;
+using FE.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FE.Controllers
 {
     public class TestController : Controller
     {
-        private readonly IHttpClientFactory _factory;
-        public TestController(IHttpClientFactory factory)
+        private readonly TestService _service;
+        public TestController(TestService service)
         {
-            _factory = factory;
+            _service = service;
         }
 
         public IActionResult SelectSubject()
@@ -21,41 +22,39 @@ namespace FE.Controllers
         [HttpGet]
         public async Task<IActionResult> Start(string subject)
         {
-            var client = _factory.CreateClient("BE");
-            var response = await client.GetAsync($"api/Test/GetQuestions/{subject}");
-            if (!response.IsSuccessStatusCode)
+            try
+            {
+                var questions = await _service.GetQuestions(subject);
+                ViewBag.Subject = subject;
+                return View(questions);
+            }
+            catch
             {
                 ViewBag.Error = "Không tải được câu hỏi.";
                 return View("Error");
             }
-
-            // Đây nên là danh sách QuestionViewModel
-            var questions = await response.Content.ReadFromJsonAsync<List<QuestionViewModel>>();
-            ViewBag.Subject = subject;
-            return View(questions);
         }
 
         [HttpPost]
         public async Task<IActionResult> Submit(string subject, Dictionary<int, string> answers)
         {
-            var client = _factory.CreateClient("BE");
-
-            // Tạo payload kiểu TestSubmitModel
-            var payload = new TestSubmitModel
+            var payload = new TestSubmitViewModel
             {
                 Subject = subject,
                 Answers = answers
             };
 
-            var response = await client.PostAsJsonAsync("api/Test/Submit", payload);
-
-            // Nhận kết quả trả về từ BE
-            var result = await response.Content.ReadFromJsonAsync<TestResultViewModel>();
-
-            ViewBag.Subject = subject;
-            return View("Result", result);
+            try
+            {
+                var result = await _service.SubmitTest(payload);
+                ViewBag.Subject = subject;
+                return View("Result", result);
+            }
+            catch
+            {
+                ViewBag.Error = "Không gửi được kết quả kiểm tra.";
+                return View("Error");
+            }
         }
-
     }
-
 }

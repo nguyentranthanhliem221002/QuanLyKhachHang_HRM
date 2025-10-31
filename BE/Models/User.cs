@@ -1,14 +1,19 @@
-﻿namespace BE.Model
-{
-    public class User
-    {
-        public int Id { get; set; }         
-        public string UserName { get; set; }
-        public string? Email { get; set; }
-        public string Password { get; set; }
-        public string? FullName { get; set; }
+﻿using Microsoft.AspNetCore.Identity;
+using System;
 
-        public string Role { get; set; }      
-        public int Status {  get; set; }
+namespace BE.Models
+{
+    public class User : IdentityUser<Guid>
+    {
+        public string FullName { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public bool IsActive { get; set; } = true;
+        public int Gender { get; set; } = 0;
+        public DateTime? DateOfBirth { get; set; }
+        public string RoleType { get; set; } = "Student";
+
+        // Quan hệ 1-1
+        public virtual Student? StudentProfile { get; set; }
+        public virtual Employee? EmployeeProfile { get; set; }
     }
 }
