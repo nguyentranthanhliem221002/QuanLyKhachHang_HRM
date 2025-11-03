@@ -1,13 +1,65 @@
-﻿version: "3.9"
+﻿# version: "3.9"
+
+# services:
+#   sqlserver:
+#     image: mcr.microsoft.com/mssql/server:2022-latest
+#     environment:
+#       ACCEPT_EULA: "Y"
+#       SA_PASSWORD: "${SA_PASSWORD}"   # production: dùng AWS Secrets
+#     ports:
+#     - "1433:1433"   # Map port 1433 ra host
+#     volumes:
+#       - sqlserver_data:/var/opt/mssql
+#     networks:
+#       - hrm-network
+
+#   be:
+#     build:
+#       context: ./BE
+#       dockerfile: Dockerfile_BE
+#     ports:
+#       - "5000:8080"   # Host 5000 → Container 8080
+#     environment:
+#       ASPNETCORE_ENVIRONMENT: Development
+#       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=${DB_NAME};User Id=${DB_USER};Password=${SA_PASSWORD};TrustServerCertificate=True;"
+#     depends_on:
+#       - sqlserver
+#     networks:
+#       - hrm-network
+
+#   fe:
+#      build:
+#         context: ./FE
+#         dockerfile: Dockerfile_FE
+#      ports:
+#         - "5001:8080"
+#      environment:
+#         ASPNETCORE_ENVIRONMENT: Development
+#         API_URL: "http://be:8080"   # FE gọi BE qua tên service trong cùng network
+#      depends_on:
+#         - be
+#      networks:
+#         - hrm-network
+
+
+# volumes:
+#   sqlserver_data:
+
+# networks:
+#   hrm-network:
+#     driver: bridge
+
+version: "3.9"
 
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "${SA_PASSWORD}"   # production: dùng AWS Secrets
+      SA_PASSWORD: "${SA_PASSWORD}"   # Có thể dùng Secrets cho môi trường Production
     ports:
-    - "1433:1433"   # Map port 1433 ra host
+      - "1433:1433"   # Map port 1433 ra host
     volumes:
       - sqlserver_data:/var/opt/mssql
     networks:
@@ -17,10 +69,11 @@ services:
     build:
       context: ./BE
       dockerfile: Dockerfile_BE
+    container_name: be
     ports:
       - "5000:8080"   # Host 5000 → Container 8080
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: "Development"
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=${DB_NAME};User Id=${DB_USER};Password=${SA_PASSWORD};TrustServerCertificate=True;"
     depends_on:
       - sqlserver
@@ -28,19 +81,19 @@ services:
       - hrm-network
 
   fe:
-     build:
-        context: ./FE
-        dockerfile: Dockerfile_FE
-     ports:
-        - "5001:8080"
-     environment:
-        ASPNETCORE_ENVIRONMENT: Development
-        API_URL: "http://be:8080"   # FE gọi BE qua tên service trong cùng network
-     depends_on:
-        - be
-     networks:
-        - hrm-network
-
+    build:
+      context: ./FE
+      dockerfile: Dockerfile_FE
+    container_name: fe
+    ports:
+      - "5001:8080"   # Host 5001 → Container 8080
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Docker"   # Để tự load appsettings.Docker.json
+      API_URL: "http://be:8080"          # FE gọi BE qua tên service trong cùng network
+    depends_on:
+      - be
+    networks:
+      - hrm-network
 
 volumes:
   sqlserver_data:

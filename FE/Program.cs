@@ -31,6 +31,16 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// ===========================================
+// ✅ Load cấu hình từ appsettings + environment
+// ===========================================
+builder.Configuration
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
+
 // =========================================================
 // 🔹 4️⃣ Cấu hình URL Backend API
 // =========================================================
