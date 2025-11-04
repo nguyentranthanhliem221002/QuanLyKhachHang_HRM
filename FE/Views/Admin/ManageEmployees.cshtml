@@ -105,10 +105,10 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="~/js/api.js"></script> <!-- include api.js -->
-    <script>
-        const apiUrl = "https://localhost:51745/api/users/employees";
 
+    <script>
+        // ✅ Lấy base API URL từ _Layout.cshtml
+        const apiUrl = window.API_URL + "/api/users/employees";
 
         // --- Render bảng nhân viên ---
         function renderEmployees(list) {
@@ -119,24 +119,23 @@
             list.forEach((emp, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                            <td>${index + 1}</td>
-                            <td>${emp.fullName}</td>
-                            <td>${emp.email}</td>
-                            <td>${emp.phone}</td>
-                            <td>${emp.position}</td>
-                            <td>${emp.level || ""}</td>
-                            <td>${emp.status == 1 ? "Active" : "Inactive"}</td>
-                            <td>
-                                <button class="btn btn-warning btn-sm" onclick="editEmployee('${emp.id}')">Sửa</button>
-                                <button class="btn btn-danger btn-sm" onclick="deleteEmployee('${emp.id}')">Xóa</button>
-                            </td>
-                        `;
+                    <td>${index + 1}</td>
+                    <td>${emp.fullName}</td>
+                    <td>${emp.email}</td>
+                    <td>${emp.phone}</td>
+                    <td>${emp.position}</td>
+                    <td>${emp.level || ""}</td>
+                    <td>${emp.status == 1 ? "Active" : "Inactive"}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="editEmployee('${emp.id}')">Sửa</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteEmployee('${emp.id}')">Xóa</button>
+                    </td>`;
                 fragment.appendChild(tr);
             });
             tbody.appendChild(fragment);
         }
 
-        // --- Load dữ liệu filter/search ---
+        // --- Load danh sách nhân viên ---
         async function loadEmployees() {
             const query = new URLSearchParams({
                 search: document.getElementById('searchEmployee').value.trim(),
@@ -144,6 +143,7 @@
                 level: document.getElementById('filterLevel').value,
                 status: document.getElementById('filterStatus').value
             });
+
             try {
                 const employees = await callApi(`${apiUrl}?${query.toString()}`);
                 renderEmployees(employees);
@@ -186,6 +186,7 @@
                 cancelButtonText: 'Hủy',
                 reverseButtons: true
             });
+
             if (result.isConfirmed) {
                 try {
                     await callApi(`${apiUrl}/${id}`, "DELETE");
@@ -197,17 +198,17 @@
             }
         }
 
-              document.getElementById('employeeForm').addEventListener('submit', async function (e) {
+        // --- Submit form thêm/sửa ---
+        document.getElementById('employeeForm').addEventListener('submit', async function (e) {
             e.preventDefault();
             const id = document.getElementById('empIndex').value;
 
-            // --- Chuẩn DTO trùng với BE ---
             const empData = {
                 FullName: document.getElementById('empFullName').value,
                 Email: document.getElementById('empEmail').value,
                 Phone: document.getElementById('empPhone').value,
                 Position: document.getElementById('empPosition').value,
-                Salary: 0, // có thể chỉnh theo input nếu cần
+                Salary: 0,
                 Status: document.getElementById('empStatus').value === "Active" ? 1 : 0,
                 Level: document.getElementById('empLevel').value
             };
@@ -217,7 +218,7 @@
 
             try {
                 await callApi(url, method, empData);
-                new bootstrap.Modal(document.getElementById('employeeModal')).hide();
+                bootstrap.Modal.getInstance(document.getElementById('employeeModal')).hide();
                 loadEmployees();
                 Swal.fire({
                     icon: 'success',
@@ -232,15 +233,14 @@
             }
         });
 
-
-        // --- Event filter & search ---
+        // --- Gắn sự kiện filter + search ---
         ['searchEmployee', 'filterPosition', 'filterLevel', 'filterStatus'].forEach(id => {
             const el = document.getElementById(id);
             const event = id === 'searchEmployee' ? 'input' : 'change';
             el.addEventListener(event, loadEmployees);
         });
 
-        // --- Load dữ liệu ban đầu ---
+        // --- Load lần đầu ---
         loadEmployees();
     </script>
 }

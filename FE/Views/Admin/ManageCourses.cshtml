@@ -58,7 +58,7 @@
             </div>
             <div class="modal-body">
                 <form id="courseForm">
-                    <input type="hidden" id="courseId" value="0" />
+                    <input type="hidden" id="courseId" value="-1" />
                     <div class="mb-3">
                         <label>Tên khóa học</label>
                         <input type="text" id="courseTitle" class="form-control" required />
@@ -116,14 +116,16 @@
 
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="~/js/api.js"></script>
+
     <script>
-        const apiUrl = "https://localhost:51745/api/course";
+        const apiUrl = window.API_URL + "/api/course";
 
         // --- Hiển thị danh sách khóa học ---
         function renderCourses(list) {
             const tbody = document.querySelector('#coursesTable tbody');
             tbody.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+
             list.forEach((c, index) => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -136,13 +138,13 @@
                     <td>
                         <button class="btn btn-warning btn-sm" onclick="editCourse(${c.id})">Sửa</button>
                         <button class="btn btn-danger btn-sm" onclick="deleteCourse(${c.id})">Xóa</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+                    </td>`;
+                fragment.appendChild(tr);
             });
+            tbody.appendChild(fragment);
         }
 
-        // --- Tải danh sách khóa học ---
+        // --- Load khóa học ---
         async function loadCourses() {
             const query = new URLSearchParams({
                 search: document.getElementById('searchCourse').value.trim(),
@@ -159,14 +161,14 @@
             }
         }
 
-        // --- Mở modal thêm mới ---
+        // --- Thêm khóa học ---
         function openAddModal() {
             document.getElementById('courseForm').reset();
-            document.getElementById('courseId').value = 0;
+            document.getElementById('courseId').value = "-1";
             new bootstrap.Modal(document.getElementById('courseModal')).show();
         }
 
-        // --- Chỉnh sửa khóa học ---
+        // --- Sửa khóa học ---
         async function editCourse(id) {
             try {
                 const c = await callApi(`${apiUrl}/${id}`);
@@ -187,28 +189,31 @@
 
         // --- Xóa khóa học ---
         async function deleteCourse(id) {
-            const confirm = await Swal.fire({
+            const result = await Swal.fire({
                 icon: 'warning',
                 title: 'Bạn có chắc muốn xóa?',
                 showCancelButton: true,
                 confirmButtonText: 'Xóa',
-                cancelButtonText: 'Hủy'
+                cancelButtonText: 'Hủy',
+                reverseButtons: true
             });
-            if (!confirm.isConfirmed) return;
 
-            try {
-                await callApi(`${apiUrl}/${id}`, "DELETE");
-                loadCourses();
-                Swal.fire({ icon: 'success', title: 'Xóa thành công!', timer: 1500, toast: true, position: 'top-end', showConfirmButton: false });
-            } catch (err) {
-                Swal.fire({ icon: 'error', title: 'Xóa thất bại', text: err.message });
+            if (result.isConfirmed) {
+                try {
+                    await callApi(`${apiUrl}/${id}`, "DELETE");
+                    loadCourses();
+                    Swal.fire({ icon: 'success', title: 'Xóa thành công!', timer: 1500, toast: true, position: 'top-end', showConfirmButton: false });
+                } catch (err) {
+                    Swal.fire({ icon: 'error', title: 'Xóa thất bại', text: err.message });
+                }
             }
         }
 
         // --- Submit thêm/sửa ---
-        document.getElementById('courseForm').addEventListener('submit', async function (e) {
+        document.getElementById('courseForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const id = parseInt(document.getElementById('courseId').value);
+            const id = document.getElementById('courseId').value;
+
             const payload = {
                 Title: document.getElementById('courseTitle').value,
                 Grade: document.getElementById('courseGrade').value,
@@ -220,34 +225,27 @@
                 EndDate: document.getElementById('courseEnd').value
             };
 
-            const method = id > 0 ? "PUT" : "POST";
-            const url = id > 0 ? `${apiUrl}/${id}` : apiUrl;
+            const method = id && id != "-1" ? "PUT" : "POST";
+            const url = id && id != "-1" ? `${apiUrl}/${id}` : apiUrl;
 
             try {
                 await callApi(url, method, payload);
                 bootstrap.Modal.getInstance(document.getElementById('courseModal')).hide();
                 loadCourses();
-                Swal.fire({
-                    icon: 'success',
-                    title: id > 0 ? 'Cập nhật thành công!' : 'Thêm thành công!',
-                    timer: 1500,
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false
-                });
+                Swal.fire({ icon: 'success', title: id != "-1" ? 'Cập nhật thành công!' : 'Thêm thành công!', timer: 1500, toast: true, position: 'top-end', showConfirmButton: false });
             } catch (err) {
                 Swal.fire({ icon: 'error', title: 'Lưu thất bại', text: err.message });
             }
         });
 
-        // --- Gắn sự kiện tìm kiếm / lọc ---
+        // --- Lọc / tìm kiếm ---
         ['searchCourse', 'filterGrade', 'filterLevel', 'filterSubject'].forEach(id => {
             const el = document.getElementById(id);
             const event = id === 'searchCourse' ? 'input' : 'change';
             el.addEventListener(event, loadCourses);
         });
 
-        // --- Load dữ liệu ban đầu ---
+        // --- Load lần đầu ---
         loadCourses();
     </script>
 }

@@ -112,150 +112,144 @@
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    const apiUrl = "https://localhost:51745/api/users/students";
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    // --- Helper gọi API ---
-    async function callApi(url, method = "GET", data = null) {
-        const options = { method, headers: {} };
-        if (data) {
-            options.headers['Content-Type'] = 'application/json';
-            options.body = JSON.stringify(data);
+    <script>
+        // ✅ Lấy base API URL từ _Layout.cshtml
+        const apiUrl = window.API_URL + "/api/users/students";
+
+        // --- Render bảng học viên ---
+        function renderStudents(list) {
+            const tbody = document.querySelector('#studentsTable tbody');
+            tbody.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+
+            list.forEach((stu, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${stu.fullName}</td>
+                    <td>${stu.email}</td>
+                    <td>${stu.className || stu.grade}</td>
+                    <td>${stu.level || ''}</td>
+                    <td>${stu.status == 1 ? "Approved" : "Pending"}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="editStudent('${stu.id}')">Sửa</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteStudent('${stu.id}')">Xóa</button>
+                    </td>`;
+                fragment.appendChild(tr);
+            });
+            tbody.appendChild(fragment);
         }
-        const res = await fetch(url, options);
-        if (!res.ok) throw new Error(`Lỗi API: ${res.status}`);
-        return method === "GET" ? await res.json() : true;
-    }
 
-    // --- Render bảng ---
-    function renderStudents(list) {
-        const tbody = document.querySelector('#studentsTable tbody');
-        tbody.innerHTML = '';
-        const fragment = document.createDocumentFragment();
-        list.forEach((stu, index) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${stu.fullName}</td>
-                <td>${stu.email}</td>
-                <td>${stu.className || stu.grade}</td>
-                <td>${stu.level || ''}</td>
-                <td>${stu.status || ''}</td>
-                <td>
-                    <button class="btn btn-warning btn-sm" onclick="editStudent('${stu.id}')">Sửa</button>
-                    <button class="btn btn-danger btn-sm" onclick="deleteStudent('${stu.id}')">Xóa</button>
-                </td>
-            `;
-            fragment.appendChild(tr);
-        });
-        tbody.appendChild(fragment);
-    }
+        // --- Load danh sách học viên ---
+        async function loadStudents() {
+            const query = new URLSearchParams({
+                search: document.getElementById('searchStudent').value.trim(),
+                grade: document.getElementById('filterGrade').value,
+                level: document.getElementById('filterLevel').value,
+                status: document.getElementById('filterStatus').value
+            });
 
-    // --- Load dữ liệu với filter/search ---
-    async function loadStudents() {
-        const query = new URLSearchParams({
-            search: document.getElementById('searchStudent').value.trim(),
-            grade: document.getElementById('filterGrade').value,
-            level: document.getElementById('filterLevel').value,
-            status: document.getElementById('filterStatus').value
-        });
-        try {
-            const students = await callApi(`${apiUrl}?${query.toString()}`);
-            renderStudents(students);
-        } catch (err) {
-            Swal.fire({ icon: 'error', title: 'Lỗi tải dữ liệu', text: err.message });
-        }
-    }
-
-    // --- Thêm học viên ---
-    function addStudent() {
-        document.getElementById('studentForm').reset();
-        document.getElementById('stuIndex').value = "-1";
-        new bootstrap.Modal(document.getElementById('studentModal')).show();
-    }
-
-    // --- Sửa học viên ---
-    async function editStudent(id) {
-        try {
-            const stu = await callApi(`${apiUrl}/${id}`);
-            document.getElementById('stuIndex').value = stu.id;
-            document.getElementById('stuFullName').value = stu.fullName;
-            document.getElementById('stuEmail').value = stu.email;
-            document.getElementById('stuPhone').value = stu.phone || '';
-            document.getElementById('stuGender').value = stu.gender ?? 0;
-            document.getElementById('stuDateOfBirth').value = stu.dateOfBirth?.split('T')[0] || '';
-            document.getElementById('stuGrade').value = stu.grade || stu.className;
-            document.getElementById('stuLevel').value = stu.level || '';
-            document.getElementById('stuStatus').value = stu.status ?? 0;
-            new bootstrap.Modal(document.getElementById('studentModal')).show();
-        } catch (err) {
-            Swal.fire({ icon: 'error', title: 'Không tìm thấy học viên', text: err.message });
-        }
-    }
-
-    // --- Xóa học viên ---
-    async function deleteStudent(id) {
-        const result = await Swal.fire({
-            icon: 'warning',
-            title: 'Bạn có chắc muốn xóa?',
-            showCancelButton: true,
-            confirmButtonText: 'Xóa',
-            cancelButtonText: 'Hủy',
-            reverseButtons: true
-        });
-        if (result.isConfirmed) {
             try {
-                await callApi(`${apiUrl}/${id}`, "DELETE");
-                loadStudents();
-                Swal.fire({ icon: 'success', title: 'Xóa thành công!', timer: 1500, toast: true, position: 'top-end', showConfirmButton: false });
+                const students = await callApi(`${apiUrl}?${query.toString()}`);
+                renderStudents(students);
             } catch (err) {
-                Swal.fire({ icon: 'error', title: 'Xóa thất bại', text: err.message });
+                Swal.fire({ icon: 'error', title: 'Lỗi tải dữ liệu', text: err.message });
             }
         }
-    }
 
-      document.getElementById('studentForm').addEventListener('submit', async function (e) {
-        e.preventDefault();
-        const id = document.getElementById('stuIndex').value;
-
-        // Body khớp CreateStudentRequest, username = email, password cứng
-        const stuData = {
-            fullName: document.getElementById('stuFullName').value,
-            email: document.getElementById('stuEmail').value,
-            className: document.getElementById('stuGrade').value,
-            enrollmentDate: new Date().toISOString(),
-            status: parseInt(document.getElementById('stuStatus').value),
-            dateOfBirth: document.getElementById('stuDateOfBirth').value || null
-        };
-
-        const method = id && id != "-1" ? "PUT" : "POST";
-        const url = id && id != "-1" ? `${apiUrl}/${id}` : apiUrl;
-
-        try {
-            await callApi(url, method, stuData);
-            new bootstrap.Modal(document.getElementById('studentModal')).hide();
-            loadStudents();
-            Swal.fire({
-                icon: 'success',
-                title: id && id != "-1" ? 'Cập nhật thành công!' : 'Thêm thành công!',
-                timer: 1500,
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false
-            });
-        } catch (err) {
-            Swal.fire({ icon: 'error', title: 'Thao tác thất bại', text: err.message });
+        // --- Thêm học viên ---
+        function addStudent() {
+            document.getElementById('studentForm').reset();
+            document.getElementById('stuIndex').value = "-1";
+            new bootstrap.Modal(document.getElementById('studentModal')).show();
         }
-    });
 
-    // --- Event filter & search ---
-    ['searchStudent', 'filterGrade', 'filterLevel', 'filterStatus'].forEach(id => {
-        const el = document.getElementById(id);
-        const event = id === 'searchStudent' ? 'input' : 'change';
-        el.addEventListener(event, loadStudents);
-    });
+        // --- Sửa học viên ---
+        async function editStudent(id) {
+            try {
+                const stu = await callApi(`${apiUrl}/${id}`);
+                document.getElementById('stuIndex').value = stu.id;
+                document.getElementById('stuFullName').value = stu.fullName;
+                document.getElementById('stuEmail').value = stu.email;
+                document.getElementById('stuPhone').value = stu.phone || '';
+                document.getElementById('stuGender').value = stu.gender ?? 0;
+                document.getElementById('stuDateOfBirth').value = stu.dateOfBirth?.split('T')[0] || '';
+                document.getElementById('stuGrade').value = stu.grade || stu.className;
+                document.getElementById('stuLevel').value = stu.level || '';
+                document.getElementById('stuStatus').value = stu.status ?? 0;
+                new bootstrap.Modal(document.getElementById('studentModal')).show();
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Không tìm thấy học viên', text: err.message });
+            }
+        }
 
-    // --- Load dữ liệu ban đầu ---
-    loadStudents();
-</script>
+        // --- Xóa học viên ---
+        async function deleteStudent(id) {
+            const result = await Swal.fire({
+                icon: 'warning',
+                title: 'Bạn có chắc muốn xóa?',
+                showCancelButton: true,
+                confirmButtonText: 'Xóa',
+                cancelButtonText: 'Hủy',
+                reverseButtons: true
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    await callApi(`${apiUrl}/${id}`, "DELETE");
+                    loadStudents();
+                    Swal.fire({ icon: 'success', title: 'Xóa thành công!', timer: 1500, toast: true, position: 'top-end', showConfirmButton: false });
+                } catch (err) {
+                    Swal.fire({ icon: 'error', title: 'Xóa thất bại', text: err.message });
+                }
+            }
+        }
+
+        // --- Submit form thêm/sửa ---
+        document.getElementById('studentForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const id = document.getElementById('stuIndex').value;
+
+            const stuData = {
+                fullName: document.getElementById('stuFullName').value,
+                email: document.getElementById('stuEmail').value,
+                className: document.getElementById('stuGrade').value,
+                enrollmentDate: new Date().toISOString(),
+                status: parseInt(document.getElementById('stuStatus').value),
+                dateOfBirth: document.getElementById('stuDateOfBirth').value || null
+            };
+
+            const method = id && id != "-1" ? "PUT" : "POST";
+            const url = id && id != "-1" ? `${apiUrl}/${id}` : apiUrl;
+
+            try {
+                await callApi(url, method, stuData);
+                bootstrap.Modal.getInstance(document.getElementById('studentModal')).hide();
+                loadStudents();
+                Swal.fire({
+                    icon: 'success',
+                    title: id && id != "-1" ? 'Cập nhật thành công!' : 'Thêm thành công!',
+                    timer: 1500,
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false
+                });
+            } catch (err) {
+                Swal.fire({ icon: 'error', title: 'Thao tác thất bại', text: err.message });
+            }
+        });
+
+        // --- Gắn sự kiện filter + search ---
+        ['searchStudent', 'filterGrade', 'filterLevel', 'filterStatus'].forEach(id => {
+            const el = document.getElementById(id);
+            const event = id === 'searchStudent' ? 'input' : 'change';
+            el.addEventListener(event, loadStudents);
+        });
+
+        // --- Load lần đầu ---
+        loadStudents();
+    </script>
+}
