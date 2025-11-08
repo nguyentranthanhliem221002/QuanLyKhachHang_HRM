@@ -56,6 +56,10 @@ builder.Services.AddHttpClient<AccountService>(configureClient).ConfigurePrimary
 builder.Services.AddHttpClient<AdminService>(configureClient).ConfigurePrimaryHttpMessageHandler(configureHandler);
 builder.Services.AddHttpClient<TestService>(configureClient).ConfigurePrimaryHttpMessageHandler(configureHandler);
 builder.Services.AddHttpClient<CourseService>(configureClient).ConfigurePrimaryHttpMessageHandler(configureHandler);
+builder.Services.AddHttpClient<PaymentService>(client =>
+{
+    client.BaseAddress = new Uri(backendUrl);
+});
 
 
 var app = builder.Build();

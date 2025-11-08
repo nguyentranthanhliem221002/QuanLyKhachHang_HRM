@@ -1,3 +1,51 @@
-﻿@{
-    ViewData["Title"] = "Index Page";
+﻿@model List<FE.Models.CourseViewModel>
+
+@{
+    ViewData["Title"] = "Thanh toán khóa học";
 }
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center text-primary fw-bold">
+        <i class="bi bi-wallet2 me-2"></i> Thanh toán khóa học
+    </h2>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info text-center shadow-sm">
+            Bạn không có khóa học nào cần thanh toán 🎉
+        </div>
+    }
+    else
+    {
+        <table class="table table-hover align-middle shadow-sm border rounded">
+            <thead class="table-primary">
+                <tr>
+                    <th class="text-center" style="width: 5%">#</th>
+                    <th>Tên khóa học</th>
+                    <th class="text-end" style="width: 20%">Học phí</th>
+                    <th class="text-center" style="width: 20%">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Count; i++)
+                {
+                    var course = Model[i];
+                    <tr>
+                        <td class="text-center">@(@i + 1)</td>
+                        <td>@course.CourseName</td>
+                        <td class="text-end">@course.Price.ToString("N0") đ</td>
+                        <td class="text-center">
+                            <form asp-controller="Payment" asp-action="PayWithMoMo" method="post">
+                                <input type="hidden" name="courseId" value="@course.Id" />
+                                <input type="hidden" name="amount" value="@course.Price" />
+                                <button type="submit" class="btn btn-sm btn-success">
+                                    <i class="bi bi-credit-card"></i> Thanh toán MoMo
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

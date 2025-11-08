@@ -48,5 +48,12 @@ namespace FE.Services
             if (!resp.IsSuccessStatusCode)
                 throw new Exception(await resp.Content.ReadAsStringAsync());
         }
+
+        public async Task<List<CourseViewModel>> GetUnpaidCoursesForStudent(string studentId)
+        {
+            var result = await _http.GetFromJsonAsync<List<CourseViewModel>>($"api/payment/unpaid/{studentId}");
+            return result ?? new List<CourseViewModel>();
+        }
+
     }
 }

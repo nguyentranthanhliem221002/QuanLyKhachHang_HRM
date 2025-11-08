@@ -10,8 +10,13 @@ namespace BE.Models
 
         [Column(TypeName = "decimal(18,3)")]
         public decimal Amount { get; set; }
-        public DateTime PaymentDate { get; set; }
-        public string Method { get; set; } // "Cash", "BankTransfer", "Online"
-        public int Status { get; set; } 
+
+        public DateTime PaymentDate { get; set; } = DateTime.Now;
+
+        public string Method { get; set; } = "MoMo"; // hoặc "Cash", "BankTransfer"
+        public int Status { get; set; } // 0=pending, 1=success, 2=failed
+
+        public string? TransactionId { get; set; }
+        public string? Description { get; set; }
     }
 }
