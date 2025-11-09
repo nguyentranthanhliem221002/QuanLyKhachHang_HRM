@@ -44,6 +44,7 @@ var backendUrl = builder.Environment.EnvironmentName == "Docker"
 Console.WriteLine($"👉 Backend API Base URL: {backendUrl}");
 
 
+
 Action<HttpClient> configureClient = client => client.BaseAddress = new Uri(backendUrl);
 Func<HttpMessageHandler> configureHandler = () => new HttpClientHandler
 {
@@ -60,6 +61,7 @@ builder.Services.AddHttpClient<PaymentService>(client =>
 {
     client.BaseAddress = new Uri(backendUrl);
 });
+
 
 
 var app = builder.Build();
