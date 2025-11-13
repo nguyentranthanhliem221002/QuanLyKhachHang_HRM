@@ -41,20 +41,8 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>()
 
 
 
-//var feUrls = builder.Configuration.GetSection("Frontend:Urls").Get<string[]>()
-//             ?? new[] { "https://localhost:51746", "https://localhost:51745", "https://localhost:5001", "https://localhost:5000", };
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("AllowFE", policy =>
-//    {
-//        policy.WithOrigins(feUrls)
-//              .AllowAnyHeader()
-//              .AllowAnyMethod();
-//    });
-//});
 var feUrls = builder.Configuration.GetSection("Frontend:Urls").Get<string[]>()
-             ?? new[] { "https://98.95.20.86" }; 
-
+             ?? new[] { "https://localhost:51746", "https://localhost:51745", "https://localhost:5001", "https://localhost:5000", "https://98.95.20.86:5001", "https://98.95.20.86:5000" };
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFE", policy =>
@@ -62,9 +50,22 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(feUrls)
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // cần nếu dùng Cookie Authentication
+                .AllowCredentials(); // cần nếu dùng Cookie Authentication
     });
 });
+//var feUrls = builder.Configuration.GetSection("Frontend:Urls").Get<string[]>()
+//             ?? new[] { "https://98.95.20.86" }; 
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowFE", policy =>
+//    {
+//        policy.WithOrigins(feUrls)
+//              .AllowAnyHeader()
+//              .AllowAnyMethod()
+//              .AllowCredentials(); // cần nếu dùng Cookie Authentication
+//    });
+//});
 
 // ===========================================
 // 5️⃣ Controllers + Swagger
@@ -75,7 +76,7 @@ builder.Services.AddSwaggerGen();
 
 
 var app = builder.Build();
-app.UseCors("AllowFE");
+
 
 using (var scope = app.Services.CreateScope())
 {
@@ -95,7 +96,7 @@ using (var scope = app.Services.CreateScope())
 // ===========================================
 // 8️⃣ Middleware
 // ===========================================
-if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Docker")
+if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Docker" || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
