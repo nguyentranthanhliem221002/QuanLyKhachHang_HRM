@@ -9,7 +9,10 @@
     var username = isAuthenticated ? user.Identity.Name : null;
     var role = user?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
-
+    // ✅ Lấy API_URL từ cấu hình môi trường (Program.cs đã load)
+    var apiUrl = Environment.GetEnvironmentVariable("API_URL")
+                 ?? ViewBag.ApiUrl
+                 ?? "https://localhost:5000"; // fallback nếu chạy local
 }
 
 
@@ -186,10 +189,12 @@
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        window.API_URL = "http://localhost:5000";
-    </script>
 
+    <script>
+       
+        window.API_URL = "@apiUrl";
+        console.log("✅ API_URL:", window.API_URL);
+    </script>
 
     <script src="~/js/api.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
