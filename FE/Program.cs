@@ -45,7 +45,8 @@ builder.Configuration
 //                 ?? "https://be:443";
 var backendUrl = Environment.GetEnvironmentVariable("API_URL_SERVER")
                  ?? builder.Configuration["BackendApi:BaseUrl"]
-                 ?? "https://98.95.20.86:5000";
+                 ?? "https://98.95.20.86:443";
+
 
 builder.Services.AddHttpClient<UserService>(c => c.BaseAddress = new Uri(backendUrl))
     .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
