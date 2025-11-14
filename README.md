@@ -34,21 +34,19 @@ Dự án **Quản lý khách hàng HRM** sử dụng **ASP.NET Core** cho Backen
 #### dotnet dev-certs https --trust
 
 # 7️⃣ Cấu hình file .env
-### ASP.NET Core settings
-#### ASPNETCORE_ENVIRONMENT=Development
-#### ASPNETCORE_URLS=https://+:443;http://+:8080
-#### ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-#### ASPNETCORE_Kestrel__Certificates__Default__Password=123456
+ASPNETCORE_ENVIRONMENT=Docker
+ASPNETCORE_URLS=https://+:443;http://+:8080
+ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+ASPNETCORE_Kestrel__Certificates__Default__Password=123456
 
-### FE gọi BE
-#### API_URL=http://be:8080
+API_URL=https://be:443
 
-### SQL Server
-#### SA_PASSWORD=Abc12345!
-#### DB_NAME=HeThongQLKH_DB
-#### DB_USER=sa
-#### DB_HOST=sqlserver
-#### DB_PORT=1433
+DB_HOST=sqlserver
+DB_PORT=1433
+DB_NAME=HeThongQLKH_DB
+DB_USER=sa
+SA_PASSWORD=Abc12345!
+
 
 # 8️⃣ Cấu hình chuỗi kết nối trong appsettings.json (BE)
 "ConnectionStrings": {
