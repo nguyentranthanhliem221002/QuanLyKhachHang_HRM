@@ -8,11 +8,11 @@
     var username = isAuthenticated ? user.Identity.Name : null;
     var role = user?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
-    // API URL: ưu tiên environment variables, fallback appsettings, fallback localhost
-    string apiUrl = Environment.GetEnvironmentVariable("API_URL_DOCKER")  // FE container gọi BE container
-                    ?? Environment.GetEnvironmentVariable("API_URL_HOST")  // FE ngoài container, trình duyệt gọi IP public
-                    ?? ViewBag.ApiUrl                                     // nếu set từ controller
-                    ?? "https://localhost:51745";                          // fallback local dev
+    string apiUrl = Environment.GetEnvironmentVariable("API_URL_DOCKER")
+                    ?? Environment.GetEnvironmentVariable("API_URL_CLIENT")
+                    ?? ViewBag.ApiUrl
+                    ?? "https://localhost:51745";
+
 }
 }
 <!DOCTYPE html>
