@@ -46,7 +46,7 @@
       ASPNETCORE_Kestrel__Certificates__Default__Password: "${ASPNETCORE_Kestrel__Certificates__Default__Password}"
       # API_URL: "${API_URL}"
       API_URL_SERVER: "https://be:443"       
-      API_URL_CLIENT: "https://localhost:5000" 
+      API_URL_CLIENT: "https://98.95.20.86:5000" 
     volumes:
       - ./https:/https:ro
     depends_on:
