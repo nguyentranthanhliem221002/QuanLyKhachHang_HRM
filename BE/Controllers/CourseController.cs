@@ -2,6 +2,7 @@
 using BE.Dtos;
 using BE.Dtos.Requests;
 using BE.Models;
+using FE.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -46,60 +47,49 @@ namespace BE.Controllers
         //}
         [HttpGet]
         public async Task<IActionResult> GetAllCourses(
-        [FromQuery] string? search,
-        [FromQuery] string? grade,
-        [FromQuery] string? level,
-        [FromQuery] string? subject)
+            [FromQuery] string? search,
+            [FromQuery] string? grade,
+            [FromQuery] string? level,
+            [FromQuery] string? subject)
         {
             var query = _context.Courses
                 .Include(c => c.Subject)
                 .AsQueryable();
 
-            // 🔍 Tìm kiếm theo tên hoặc mô tả
             if (!string.IsNullOrWhiteSpace(search))
-            {
-                query = query.Where(c =>
-                    c.Title.Contains(search) ||
-                    c.Description.Contains(search));
-            }
+                query = query.Where(c => c.Title.Contains(search) || c.Description.Contains(search));
 
-            // 🎓 Lọc theo lớp học (Grade)
             if (!string.IsNullOrWhiteSpace(grade))
-            {
                 query = query.Where(c => c.Grade == grade);
-            }
 
-            // 📈 Lọc theo mức học (Level)
             if (!string.IsNullOrWhiteSpace(level))
-            {
                 query = query.Where(c => c.Level == level);
-            }
 
-            // 📘 Lọc theo môn học (Subject)
             if (!string.IsNullOrWhiteSpace(subject))
             {
-                query = query.Where(c => c.Subject.Name == subject);
+                if (Guid.TryParse(subject, out var subjectId))
+                    query = query.Where(c => c.SubjectId == subjectId);
             }
 
             var courses = await query
-                  .Select(c => new CourseDTO
-                  {
-                      Id = c.Id,
-                      Title = c.Title,
-                      Description = c.Description,
-                      Fee = c.Fee,
-                      StartDate = c.StartDate,
-                      EndDate = c.EndDate,
-                      Grade = c.Grade,
-                      Level = c.Level,
-                      SubjectId = c.SubjectId,
-                      SubjectName = c.Subject.Name
-                  })
-                  .ToListAsync();
-
+                .Select(c => new CourseDTO
+                {
+                    Id = c.Id,
+                    Title = c.Title,
+                    Description = c.Description,
+                    Fee = c.Fee,
+                    StartDate = c.StartDate,
+                    EndDate = c.EndDate,
+                    Grade = c.Grade,
+                    Level = c.Level,
+                    SubjectId = c.SubjectId,
+                    SubjectName = c.Subject.Name
+                })
+                .ToListAsync();
 
             return Ok(courses);
         }
+
 
         //[HttpPost]
         //public async Task<IActionResult> CreateCourse([FromBody] Course course)
@@ -133,7 +123,7 @@ namespace BE.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetCourseById(int id)
+        public async Task<IActionResult> GetCourseById(Guid id)
         {
             var course = await _context.Courses
                 .Include(c => c.Subject)
@@ -173,7 +163,7 @@ namespace BE.Controllers
         //    return Ok(course);
         //}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCourse(int id, [FromBody] UpdateCourseRequest model)
+        public async Task<IActionResult> UpdateCourse(Guid id, [FromBody] UpdateCourseRequest model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -195,9 +185,8 @@ namespace BE.Controllers
 
             return Ok(new { Message = "Cập nhật khóa học thành công", Data = course });
         }
-
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCourse(int id)
+        public async Task<IActionResult> DeleteCourse(Guid id)
         {
             var course = await _context.Courses.FindAsync(id);
             if (course == null) return NotFound();
@@ -206,6 +195,72 @@ namespace BE.Controllers
             await _context.SaveChangesAsync();
             return NoContent();
         }
+
+
+        [HttpPost("register")]
+        public async Task<IActionResult> RegisterStudent([FromBody] RegistrationRequest model)
+        {
+            if (model.UserId == Guid.Empty)
+                return BadRequest(new { Message = "UserId không hợp lệ." });
+
+            if (model.CourseId == Guid.Empty)
+                return BadRequest(new { Message = "CourseId không hợp lệ." });
+
+            var userExists = await _context.Users.AnyAsync(u => u.Id == model.UserId);
+            if (!userExists)
+                return BadRequest(new { Message = "Người dùng không tồn tại." });
+
+            var courseExists = await _context.Courses.AnyAsync(c => c.Id == model.CourseId);
+            if (!courseExists)
+                return BadRequest(new { Message = "Khóa học không tồn tại." });
+
+            var alreadyRegistered = await _context.Registrations
+                .AnyAsync(r => r.UserId == model.UserId && r.CourseId == model.CourseId);
+
+            if (alreadyRegistered)
+                return BadRequest(new { Message = "Bạn đã đăng ký khóa học này rồi." });
+
+            var registration = new Registration
+            {
+                UserId = model.UserId,
+                CourseId = model.CourseId,
+                Grade = model.Grade,
+                Level = model.Level,
+                Status = model.Status // 0 = Pending
+            };
+
+            _context.Registrations.Add(registration);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "Đăng ký khóa học thành công!", Data = registration });
+        }
+
+        [HttpGet("student/{studentId}")]
+        public async Task<IActionResult> GetCoursesByStudentId(Guid studentId)
+        {
+            var courses = await _context.Registrations
+                .Where(r => r.UserId == studentId)
+                .Include(r => r.Course)
+                .ThenInclude(c => c.Subject)
+                .Select(r => new CourseDTO
+                {
+                    Id = r.Course.Id,
+                    Title = r.Course.Title,
+                    Description = r.Course.Description,
+                    Fee = r.Course.Fee,
+                    StartDate = r.Course.StartDate,
+                    EndDate = r.Course.EndDate,
+                    SubjectId = r.Course.SubjectId,
+                    SubjectName = r.Course.Subject.Name,
+                    Grade = r.Course.Grade,
+                    Level = r.Course.Level,
+                    IsPaid = r.Status == 1 // 1 = Paid, 0 = Pending
+                })
+                .ToListAsync();
+
+            return Ok(courses);
+        }
+
     }
 
 }

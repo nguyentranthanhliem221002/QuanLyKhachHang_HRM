@@ -55,30 +55,26 @@ namespace FE.Services
             var message = await resp.Content.ReadFromJsonAsync<dynamic>();
             return message?.message ?? "Tạo học viên thành công";
         }
-        // ===========================
-        // ✅ Lấy thông tin học viên theo ID
-        // ===========================
         public async Task<UserViewModel?> GetStudentByIdAsync(Guid id)
         {
-            var result = await _http.GetFromJsonAsync<UserViewModel>($"api/users/students/{id}");
-            return result;
+            return await _http.GetFromJsonAsync<UserViewModel>($"api/users/students/{id}");
         }
 
-        // ===========================
-        // ✅ Sửa học viên
-        // ===========================
-        //public async Task<string> UpdateStudentAsync(Guid id, CreateStudentRequest req)
-        //{
-        //    var resp = await _http.PutAsJsonAsync($"api/users/students/{id}", req);
-        //    if (!resp.IsSuccessStatusCode)
-        //    {
-        //        var error = await resp.Content.ReadAsStringAsync();
-        //        throw new Exception($"Lỗi khi cập nhật học viên: {error}");
-        //    }
+        //===========================
+        //✅ Sửa học viên
+        //===========================
+        public async Task<string> UpdateStudentAsync(Guid id, CreateStudentRequest req)
+        {
+            var resp = await _http.PutAsJsonAsync($"api/users/students/{id}", req);
+            if (!resp.IsSuccessStatusCode)
+            {
+                var error = await resp.Content.ReadAsStringAsync();
+                throw new Exception($"Lỗi khi cập nhật học viên: {error}");
+            }
 
-        //    var message = await resp.Content.ReadFromJsonAsync<dynamic>();
-        //    return message?.message ?? "Cập nhật học viên thành công";
-        //}
+            var message = await resp.Content.ReadFromJsonAsync<dynamic>();
+            return message?.message ?? "Cập nhật học viên thành công";
+        }
 
         public async Task<string> UpdateStudentAsync(Guid id, UpdateStudentRequest req)
         {

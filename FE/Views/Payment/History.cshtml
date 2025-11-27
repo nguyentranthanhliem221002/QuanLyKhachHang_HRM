@@ -1,3 +1,45 @@
-﻿@{
-    ViewData["Title"] = "History Page";
+﻿@model List<FE.Models.PaymentViewModel>
+@{
+    Layout = "~/Views/Shared/_Layout_Student.cshtml";
+    ViewData["Title"] = "Lịch sử thanh toán";
+}
+
+<h2>Lịch sử thanh toán</h2>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Khóa học</th>
+                <th>Giảng viên</th>
+                <th>Thời gian</th>
+                <th>Trạng thái thanh toán</th>
+                <th>Phí</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>@p.CourseTitle</td>
+                    <td>@p.SubjectName</td>
+                    <td>@p.StartDate:dd/MM/yyyy - @p.EndDate:dd/MM/yyyy</td>
+                    <td>@(p.IsPaid ? "Đã thanh toán" : "Chưa thanh toán")</td>
+                    <td>@p.Fee:N0 đ</td>
+                    <td>
+                        @if (p.IsPaid)
+                        {
+                            <a asp-action="Details" asp-route-id="@p.CourseId" class="btn btn-success btn-sm">Xem chi tiết</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Bạn chưa có lịch sử thanh toán.</p>
 }

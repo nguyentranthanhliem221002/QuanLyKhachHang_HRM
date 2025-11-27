@@ -41,6 +41,7 @@ namespace BE.Data
 
         // Các DbSet khác của bạn
         public DbSet<Course> Courses { get; set; }
+        public DbSet<Registration> Registrations { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<Student> Students { get; set; }
         public DbSet<Payment> Payments { get; set; }

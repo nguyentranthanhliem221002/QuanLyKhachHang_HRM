@@ -24,5 +24,11 @@ namespace BE.Dtos
 
         public int Status { get; set; } = 0;
         public DateTime DateOfBirth { get; set; } = DateTime.Now.AddYears(-18);
+
+        // Thêm ClassName để khớp Model
+        public string ClassName { get; set; } = string.Empty;
+
+        // Thêm các thông tin liên quan nếu cần (Enrollments, UserId...)
+        public Guid UserId { get; set; }
     }
 }

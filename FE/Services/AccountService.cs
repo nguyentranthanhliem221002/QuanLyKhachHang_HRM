@@ -61,9 +61,12 @@ namespace FE.Services
         public class LoginResult
         {
             public string username { get; set; } = null!;
+            public string email { get; set; } = null!;
             public string fullname { get; set; } = null!;
             public string role { get; set; } = null!;
             public string message { get; set; } = null!;
+            public string userId { get; set; } = null!;
+
         }
 
         private class RegisterResult

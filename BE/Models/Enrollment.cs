@@ -10,7 +10,7 @@ namespace BE.Models
         [ForeignKey("StudentId")]
         public Student Student { get; set; }
 
-        public int CourseId { get; set; }
+        public Guid CourseId { get; set; }
         [ForeignKey("CourseId")]
         public Course Course { get; set; }
 

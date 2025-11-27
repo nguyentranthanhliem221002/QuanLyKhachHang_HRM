@@ -1,10 +1,10 @@
 ﻿@model FE.Models.RegistrationViewModel
 @using System.Text.Json
 @{
-    var userId = User?.FindFirst("UserId")?.Value;
-    if (!string.IsNullOrEmpty(userId))
+    var userIdClaim = User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    if (!string.IsNullOrEmpty(userIdClaim))
     {
-        Model.UserId = Guid.Parse(userId);
+        Model.UserId = Guid.Parse(userIdClaim);
     }
 }
 

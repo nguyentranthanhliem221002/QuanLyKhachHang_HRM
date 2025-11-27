@@ -3,7 +3,7 @@
     public class Schedule : Base
     {
         public int Id { get; set; }
-        public int CourseId { get; set; }
+        public Guid CourseId { get; set; }
         public Course Course { get; set; }
 
         public DateTime StartTime { get; set; }

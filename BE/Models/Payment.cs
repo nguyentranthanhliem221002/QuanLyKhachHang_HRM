@@ -5,13 +5,15 @@ namespace BE.Models
     public class Payment : Base
     {
         public int Id { get; set; }
-        public int EnrollmentId { get; set; }
-        public Enrollment Enrollment { get; set; }
+        public Guid UserId { get; set; }
+        public Guid CourseId { get; set; }
 
         [Column(TypeName = "decimal(18,3)")]
         public decimal Amount { get; set; }
-        public DateTime PaymentDate { get; set; }
-        public string Method { get; set; } // "Cash", "BankTransfer", "Online"
-        public int Status { get; set; } 
+        public string OrderId { get; set; } = string.Empty;
+        public bool IsPaid { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public Course Course { get; set; }
+
     }
 }

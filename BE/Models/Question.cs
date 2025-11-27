@@ -9,7 +9,7 @@
         public string OptionC { get; set; } = null!;
         public string OptionD { get; set; } = null!;
         public string CorrectAnswer { get; set; } = null!; // A / B / C / D
-        public int SubjectId { get; set; }
+        public Guid SubjectId { get; set; }
         public Subject Subject { get; set; } = null!;
     }
 }

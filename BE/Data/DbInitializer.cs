@@ -80,7 +80,9 @@ namespace BE.Data
                             StudentCode = "SV001",
                             ClassName = "10A1",
                             EnrollmentDate = DateTime.Now,
-                            Status = 0
+                            Status = 0,
+                            Grade = "10",
+                            Level = "Cơ bản"
                         };
                         context.Students.Add(student);
                     }
@@ -141,42 +143,43 @@ namespace BE.Data
                 Console.WriteLine("✅ Đã seed dữ liệu câu hỏi.");
             }
 
-            // =======================
-            // 5️⃣ Seed Courses
-            // =======================
             if (!await context.Courses.AnyAsync())
             {
                 var subjects = await context.Subjects.ToListAsync();
-
                 var courses = new List<Course>();
+
+                var grades = new[] { "10", "11", "12" };
+                var levels = new[] { "Trung bình", "Khá", "Giỏi" };
 
                 foreach (var subject in subjects)
                 {
-                    courses.Add(new Course
+                    foreach (var grade in grades)
                     {
-                        Title = $"Khóa {subject.Name} Cơ Bản",
-                        Description = $"Khóa học nền tảng cho môn {subject.Name}, phù hợp học sinh phổ thông.",
-                        Fee = 1000000m,
-                        StartDate = DateTime.Now.AddDays(-7),
-                        EndDate = DateTime.Now.AddMonths(2),
-                        SubjectId = subject.Id
-                    });
+                        foreach (var level in levels)
+                        {
+                            var fee = level == "Trung bình" ? 1000000m :
+                                      level == "Khá" ? 1200000m :
+                                      1500000m;
 
-                    courses.Add(new Course
-                    {
-                        Title = $"Khóa {subject.Name} Nâng Cao",
-                        Description = $"Khóa học nâng cao kiến thức chuyên sâu môn {subject.Name}.",
-                        Fee = 1500000m,
-                        StartDate = DateTime.Now,
-                        EndDate = DateTime.Now.AddMonths(3),
-                        SubjectId = subject.Id
-                    });
+                            courses.Add(new Course
+                            {
+                                Id = Guid.NewGuid(),
+                                Title = $"Khóa {subject.Name} - Lớp {grade} - {level}",
+                                Description = $"Khóa học {level} lớp {grade} môn {subject.Name}.",
+                                Fee = fee,
+                                StartDate = DateTime.Now.AddDays(-7),
+                                EndDate = DateTime.Now.AddMonths(2),
+                                SubjectId = subject.Id,
+                                Grade = grade,
+                                Level = level
+                            });
+                        }
+                    }
                 }
 
                 await context.Courses.AddRangeAsync(courses);
                 await context.SaveChangesAsync();
-
-                Console.WriteLine("✅ Đã seed dữ liệu Courses (khóa học).");
+                Console.WriteLine("✅ Đã seed dữ liệu Courses (khóa học) với Id là Guid.");
             }
 
             Console.WriteLine("✅ Seed dữ liệu ban đầu hoàn tất (không xóa dữ liệu cũ).");

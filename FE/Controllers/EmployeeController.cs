@@ -21,7 +21,7 @@ namespace FE.Controllers
             var employees = await _userService.GetAllEmployeesAsync();
 
             // Lấy nhân viên hiện tại dựa trên email đăng nhập
-            var currentEmployee = employees.FirstOrDefault(e => e.Email == User.Identity?.Name);
+            var currentEmployee = employees.FirstOrDefault(e => e.UserName == User.Identity?.Name);
 
             if (currentEmployee == null)
                 return NotFound("Không tìm thấy thông tin nhân viên.");

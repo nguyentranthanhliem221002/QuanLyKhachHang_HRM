@@ -236,7 +236,7 @@ namespace BE.Controllers
                 FullName = req.FullName,
                 IsActive = true,
                 RoleType = "Student",
-                EmailConfirmed = true
+                EmailConfirmed = true,
             };
 
             var result = await _userManager.CreateAsync(user, "Student@1234");
@@ -248,7 +248,10 @@ namespace BE.Controllers
                 UserId = user.Id,
                 ClassName = req.ClassName,
                 EnrollmentDate = req.EnrollmentDate,
-                Status = req.Status
+                Status = req.Status,
+                Grade = req.Grade,
+                StudentCode = "SV" + user.Id,
+                Level = req.Level,
             };
 
             _context.Students.Add(student);
@@ -296,19 +299,20 @@ namespace BE.Controllers
             if (user == null)
                 return NotFound(new { message = "Không tìm thấy học viên" });
 
-            // ✅ Cập nhật thông tin user
             user.FullName = req.FullName;
             user.Email = req.Email;
+            user.DateOfBirth = req.DateOfBirth;
 
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
                 return BadRequest(new { message = string.Join(", ", result.Errors.Select(e => e.Description)) });
 
-            // ✅ Cập nhật StudentProfile
             var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == id);
             if (student != null)
             {
                 student.ClassName = req.ClassName;
+                student.Grade = req.Grade;
+                student.Level = req.Level;
                 student.EnrollmentDate = req.EnrollmentDate;
                 student.Status = req.Status;
                 await _context.SaveChangesAsync();
@@ -316,6 +320,7 @@ namespace BE.Controllers
 
             return Ok(new { message = $"Cập nhật học viên {req.FullName} thành công" });
         }
+
 
         // ===========================
         // 🔹 Xóa học viên
@@ -369,7 +374,7 @@ namespace BE.Controllers
                 Position = req.Position,
                 Level = req.Level,
                 Salary = req.Salary,
-                Status = req.Status
+                //Status = req.Status
             };
 
             _context.Employees.Add(employee);
@@ -516,6 +521,32 @@ namespace BE.Controllers
 
         //    return Ok(list);
         //}
+        [HttpGet("students/{id:guid}")]
+        public async Task<IActionResult> GetStudentById(Guid id)
+        {
+            var user = await _context.Users
+                .Include(u => u.StudentProfile)
+                .FirstOrDefaultAsync(u => u.Id == id && u.StudentProfile != null);
+
+            if (user == null)
+                return NotFound(new { message = "Không tìm thấy học viên" });
+
+            var student = new
+            {
+                user.Id,
+                user.FullName,
+                user.Email,
+                user.UserName,
+                user.StudentProfile.Grade,
+                user.StudentProfile.Level,
+                user.StudentProfile.Status,
+                user.StudentProfile.ClassName,
+                user.StudentProfile.EnrollmentDate
+            };
+
+            return Ok(student);
+        }
+
         [HttpGet("students")]
         public async Task<IActionResult> GetStudents(
         [FromQuery] string? search,
@@ -551,8 +582,10 @@ namespace BE.Controllers
                 u.FullName,
                 u.Email,
                 u.StudentProfile.Grade,
+                u.StudentProfile.EnrollmentDate,
                 u.StudentProfile.Level,
-                u.StudentProfile.Status
+                u.StudentProfile.Status,
+                u.StudentProfile.ClassName,
             }).ToListAsync();
 
             return Ok(list);
@@ -621,6 +654,7 @@ namespace BE.Controllers
                 u.Email,
                 u.UserName,
                 u.EmployeeProfile.Phone,
+                u.EmployeeProfile.DateOfJoining,
                 u.EmployeeProfile.Position,
                 u.EmployeeProfile.Level,
                 u.EmployeeProfile.Salary,

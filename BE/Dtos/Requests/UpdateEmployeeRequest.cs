@@ -5,16 +5,10 @@ namespace BE.Dtos.Requests
    
     public class UpdateEmployeeRequest : UserBaseRequest
     {
-        [Required(ErrorMessage = "Vui lòng nhập số điện thoại")]
-        public string Phone { get; set; }
-
-        [Required(ErrorMessage = "Vui lòng nhập chức vụ")]
-        public string Position { get; set; }
-
-        [Required(ErrorMessage = "Vui lòng nhập cấp độ")]
-        public string Level { get; set; }
-
+        public string Phone { get; set; } = string.Empty;
+        public string Position { get; set; } = string.Empty;
+        public string Level { get; set; } = string.Empty;
         public decimal Salary { get; set; }
-        public int Status { get; set; }
+        public int Status { get; set; }   // 🔹 Thêm
     }
 }

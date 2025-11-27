@@ -74,6 +74,10 @@ namespace BE.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequest req)
         {
             var user = await _userManager.FindByNameAsync(req.UserName);
+
+            if (user == null)
+                user = await _userManager.FindByEmailAsync(req.UserName);
+
             if (user == null)
                 return Unauthorized(new { message = "Sai tài khoản hoặc mật khẩu" });
 
@@ -87,7 +91,9 @@ namespace BE.Controllers
             {
                 username = user.UserName,
                 fullname = user.FullName,
+                email = user.Email,
                 role = roles.FirstOrDefault() ?? "Student",
+                userId = user.Id, // Guid
                 message = "Đăng nhập thành công"
             });
         }

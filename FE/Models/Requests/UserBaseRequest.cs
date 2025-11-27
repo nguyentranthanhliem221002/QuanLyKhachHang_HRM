@@ -15,11 +15,7 @@ namespace FE.Models.Requests
 {
     public class UserBaseRequest
     {
-        [Required(ErrorMessage = "Vui lòng nhập Họ và tên")]
-        public string FullName { get; set; }
-
-        [Required(ErrorMessage = "Vui lòng nhập Email")]
-        [EmailAddress]
-        public string Email { get; set; }
+        [Required] public string FullName { get; set; }
+        [Required, EmailAddress] public string Email { get; set; }
     }
 }

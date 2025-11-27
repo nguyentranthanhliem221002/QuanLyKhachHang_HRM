@@ -11,6 +11,7 @@
         public int Status { get; set; }
         public DateTime DateOfJoining { get; set; }
         public string Level { get; set; } = string.Empty;
+        public Guid UserId { get; set; }
     }
 
 }

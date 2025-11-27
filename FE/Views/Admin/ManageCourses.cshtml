@@ -25,11 +25,6 @@
 
     <select id="filterSubject" class="form-select w-auto">
         <option value="">Tất cả môn học</option>
-        <option value="Toán">Toán</option>
-        <option value="Vật lý">Vật lý</option>
-        <option value="Hóa học">Hóa học</option>
-        <option value="Sinh học">Sinh học</option>
-        <option value="Ngữ văn">Ngữ văn</option>
     </select>
 </div>
 
@@ -82,11 +77,7 @@
                     <div class="mb-3">
                         <label>Môn học</label>
                         <select id="courseSubject" class="form-select" required>
-                            <option value="1">Toán</option>
-                            <option value="2">Vật lý</option>
-                            <option value="3">Hóa học</option>
-                            <option value="4">Sinh học</option>
-                            <option value="5">Ngữ văn</option>
+                            <option value="">Chọn môn học</option>
                         </select>
                     </div>
                     <div class="mb-3">
@@ -119,25 +110,52 @@
 
     <script>
         const apiUrl = window.API_URL + "/api/course";
+        const subjectApiUrl = window.API_URL + "/api/subject";
+
+        const courseSubjectSelect = document.getElementById('courseSubject');
+        const filterSubjectSelect = document.getElementById('filterSubject');
+        let subjects = [];
+
+        // --- Load danh sách môn học ---
+        async function loadSubjects() {
+            try {
+                subjects = await callApi(subjectApiUrl); // [{ id, name }]
+                courseSubjectSelect.innerHTML = '<option value="">Chọn môn học</option>';
+                filterSubjectSelect.innerHTML = '<option value="">Tất cả môn học</option>';
+                subjects.forEach(s => {
+                    const opt = document.createElement('option');
+                    opt.value = s.id;
+                    opt.textContent = s.name;
+                    courseSubjectSelect.appendChild(opt);
+
+                    const optFilter = document.createElement('option');
+                    optFilter.value = s.id;
+                    optFilter.textContent = s.name;
+                    filterSubjectSelect.appendChild(optFilter);
+                });
+            } catch(err) {
+                console.error("Lỗi load môn học:", err);
+            }
+        }
 
         // --- Hiển thị danh sách khóa học ---
         function renderCourses(list) {
             const tbody = document.querySelector('#coursesTable tbody');
             tbody.innerHTML = '';
             const fragment = document.createDocumentFragment();
-
             list.forEach((c, index) => {
                 const tr = document.createElement('tr');
+                const subjectName = subjects.find(s => s.id == c.subjectId)?.name ?? '';
                 tr.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${c.title}</td>
                     <td>${c.grade}</td>
                     <td>${c.level}</td>
-                    <td>${c.subjectName ?? ''}</td>
+                    <td>${subjectName}</td>
                     <td>${c.fee?.toLocaleString('vi-VN')} đ</td>
                     <td>
-                        <button class="btn btn-warning btn-sm" onclick="editCourse(${c.id})">Sửa</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteCourse(${c.id})">Xóa</button>
+                        <button class="btn btn-warning btn-sm" onclick="editCourse('${c.id}')">Sửa</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCourse('${c.id}')">Xóa</button>
                     </td>`;
                 fragment.appendChild(tr);
             });
@@ -152,11 +170,10 @@
                 level: document.getElementById('filterLevel').value,
                 subject: document.getElementById('filterSubject').value
             });
-
             try {
                 const courses = await callApi(`${apiUrl}?${query.toString()}`);
                 renderCourses(courses);
-            } catch (err) {
+            } catch(err) {
                 Swal.fire({ icon: 'error', title: 'Lỗi tải dữ liệu', text: err.message });
             }
         }
@@ -182,7 +199,7 @@
                 if (c.startDate) document.getElementById('courseStart').value = c.startDate.split('T')[0];
                 if (c.endDate) document.getElementById('courseEnd').value = c.endDate.split('T')[0];
                 new bootstrap.Modal(document.getElementById('courseModal')).show();
-            } catch (err) {
+            } catch(err) {
                 Swal.fire({ icon: 'error', title: 'Không tìm thấy khóa học', text: err.message });
             }
         }
@@ -197,55 +214,51 @@
                 cancelButtonText: 'Hủy',
                 reverseButtons: true
             });
-
-            if (result.isConfirmed) {
-                try {
+            if(result.isConfirmed){
+                try{
                     await callApi(`${apiUrl}/${id}`, "DELETE");
                     loadCourses();
-                    Swal.fire({ icon: 'success', title: 'Xóa thành công!', timer: 1500, toast: true, position: 'top-end', showConfirmButton: false });
-                } catch (err) {
-                    Swal.fire({ icon: 'error', title: 'Xóa thất bại', text: err.message });
+                    Swal.fire({ icon: 'success', title: 'Xóa thành công!', timer:1500, toast:true, position:'top-end', showConfirmButton:false });
+                }catch(err){
+                    Swal.fire({ icon:'error', title:'Xóa thất bại', text: err.message });
                 }
             }
         }
 
         // --- Submit thêm/sửa ---
-        document.getElementById('courseForm').addEventListener('submit', async (e) => {
+        document.getElementById('courseForm').addEventListener('submit', async e => {
             e.preventDefault();
             const id = document.getElementById('courseId').value;
-
             const payload = {
                 Title: document.getElementById('courseTitle').value,
                 Grade: document.getElementById('courseGrade').value,
                 Level: document.getElementById('courseLevel').value,
-                SubjectId: parseInt(document.getElementById('courseSubject').value),
+                SubjectId: document.getElementById('courseSubject').value,
                 Fee: parseFloat(document.getElementById('courseFee').value || '0'),
                 Description: document.getElementById('courseDescription').value,
                 StartDate: document.getElementById('courseStart').value,
                 EndDate: document.getElementById('courseEnd').value
             };
-
             const method = id && id != "-1" ? "PUT" : "POST";
             const url = id && id != "-1" ? `${apiUrl}/${id}` : apiUrl;
-
-            try {
+            try{
                 await callApi(url, method, payload);
                 bootstrap.Modal.getInstance(document.getElementById('courseModal')).hide();
                 loadCourses();
-                Swal.fire({ icon: 'success', title: id != "-1" ? 'Cập nhật thành công!' : 'Thêm thành công!', timer: 1500, toast: true, position: 'top-end', showConfirmButton: false });
-            } catch (err) {
-                Swal.fire({ icon: 'error', title: 'Lưu thất bại', text: err.message });
+                Swal.fire({ icon: 'success', title: id != "-1" ? 'Cập nhật thành công!' : 'Thêm thành công!', timer:1500, toast:true, position:'top-end', showConfirmButton:false });
+            }catch(err){
+                Swal.fire({ icon:'error', title:'Lưu thất bại', text: err.message });
             }
         });
 
-        // --- Lọc / tìm kiếm ---
-        ['searchCourse', 'filterGrade', 'filterLevel', 'filterSubject'].forEach(id => {
+        // --- Filter / tìm kiếm ---
+        ['searchCourse','filterGrade','filterLevel','filterSubject'].forEach(id=>{
             const el = document.getElementById(id);
-            const event = id === 'searchCourse' ? 'input' : 'change';
+            const event = id==='searchCourse' ? 'input':'change';
             el.addEventListener(event, loadCourses);
         });
 
         // --- Load lần đầu ---
-        loadCourses();
+        loadSubjects().then(loadCourses);
     </script>
 }

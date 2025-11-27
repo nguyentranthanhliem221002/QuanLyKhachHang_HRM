@@ -1,5 +1,6 @@
 ﻿using FE.Models;
 using System.Net.Http.Json;
+
 namespace FE.Services
 {
     public class RegistrationService
@@ -11,10 +12,10 @@ namespace FE.Services
             _http = http;
         }
 
-        // Gửi đăng ký học viên + khóa học
+        // Đăng ký học viên + khóa học
         public async Task<bool> RegisterStudentAsync(RegistrationViewModel model)
         {
-            var response = await _http.PostAsJsonAsync("api/student/register", model);
+            var response = await _http.PostAsJsonAsync("api/course/register", model);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -24,6 +25,15 @@ namespace FE.Services
             }
 
             return true;
+        }
+
+        // Thanh toán MoMo
+        public async Task<string> PayWithMoMoAsync(Guid userId, Guid courseId, decimal amount)
+        {
+            var model = new { UserId = userId, CourseId = courseId, Amount = amount };
+            var resp = await _http.PostAsJsonAsync("api/payment/momo", model);
+            var result = await resp.Content.ReadFromJsonAsync<dynamic>();
+            return result.payUrl;
         }
     }
 }

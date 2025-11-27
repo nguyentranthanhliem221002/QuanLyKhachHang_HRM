@@ -4,26 +4,19 @@ namespace FE.Models
 {
     public class RegistrationViewModel
     {
+        [Required]
+        public Guid UserId { get; set; }  // Dùng gửi kèm học viên đang đăng ký
 
+        [Required]
+        public Guid CourseId { get; set; }  // Khóa học chọn để đăng ký
 
-        //[Required] public string Grade { get; set; }
-        //[Required] public string Level { get; set; }
-        //[Required] public string FullName { get; set; }
-        //[Required, EmailAddress] public string Email { get; set; }
-        //[Required, Phone] public string Phone { get; set; }
-        //[Required] public int Gender { get; set; }
-        //public int Status { get; set; }
-        //public DateTime DateOfBirth { get; set; } = DateTime.Now.AddYears(-18);
-        [Required] public string Grade { get; set; }
-        [Required] public string Level { get; set; }
-        [Required] public string FullName { get; set; }
-        [Required, EmailAddress] public string Email { get; set; }
-        [Required, Phone] public string Phone { get; set; }
-        [Required] public int Gender { get; set; }
-        [Required, DataType(DataType.Date)]
-        public DateTime DateOfBirth { get; set; } = DateTime.Now.AddYears(-18);
+        [Required]
+        public string Grade { get; set; } = string.Empty;
 
-        [Required, DataType(DataType.Password)]
-        public string Password { get; set; }
+        [Required]
+        public string Level { get; set; } = string.Empty;
+        public int Status { get; set; } = 0;
+
+    
     }
 }

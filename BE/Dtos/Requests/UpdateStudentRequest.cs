@@ -4,11 +4,13 @@ namespace BE.Dtos.Requests
 {
     public class UpdateStudentRequest : UserBaseRequest
     {
-        [Required(ErrorMessage = "Vui lòng nhập lớp")]
-        public string ClassName { get; set; }
+        public string ClassName { get; set; } = string.Empty;
+        public string Grade { get; set; } = string.Empty;
+        public string Level { get; set; } = string.Empty;
+        public DateTime? DateOfBirth { get; set; }
 
-        public DateTime EnrollmentDate { get; set; }
-        public int Status { get; set; }
+        public DateTime EnrollmentDate { get; set; }  // 🔹 Thêm
+        public int Status { get; set; }               // 🔹 Thêm
     }
 
 }

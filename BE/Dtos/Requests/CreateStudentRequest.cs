@@ -5,12 +5,15 @@ namespace BE.Dtos.Requests
     public class CreateStudentRequest : UserBaseRequest
     {
 
-        [Required(ErrorMessage = "Vui lòng nhập lớp")]
-        public string ClassName { get; set; }
+        public string ClassName { get; set; } = string.Empty;
+        public string Grade { get; set; } = string.Empty;
+        public string Level { get; set; } = string.Empty;
+
         public DateTime? DateOfBirth { get; set; }
 
-        public DateTime EnrollmentDate { get; set; } = DateTime.Now;
-        public int Status { get; set; } = 0;
+        // Thêm các property cần thiết cho controller
+        public DateTime EnrollmentDate { get; set; }  // ngày ghi danh
+        public int Status { get; set; }               // trạng thái học viên
     }
 
 }

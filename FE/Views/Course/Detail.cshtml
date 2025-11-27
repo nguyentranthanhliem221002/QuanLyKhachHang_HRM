@@ -1,0 +1,28 @@
+﻿@model FE.Models.CourseViewModel
+@{
+    Layout = "~/Views/Shared/_Layout_Student.cshtml";
+    ViewData["Title"] = "Chi tiết khóa học";
+}
+
+<h2>@Model.Title</h2>
+
+<div class="mb-3">
+    <strong>Giảng viên:</strong> @Model.SubjectName
+</div>
+<div class="mb-3">
+    <strong>Lớp:</strong> @Model.Grade
+</div>
+<div class="mb-3">
+    <strong>Mức học:</strong> @Model.Level
+</div>
+<div class="mb-3">
+    <strong>Thời gian:</strong> @Model.StartDate.ToString("dd/MM/yyyy") - @Model.EndDate.ToString("dd/MM/yyyy")
+</div>
+<div class="mb-3">
+    <strong>Giá:</strong> @Model.Fee.ToString("N0") đ
+</div>
+<div class="mb-3">
+    <strong>Mô tả:</strong>
+    <p>@Model.Description</p>
+</div>
+<a asp-action="Index" class="btn btn-secondary">Quay lại</a>

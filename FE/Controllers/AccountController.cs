@@ -56,14 +56,13 @@ namespace FE.Controllers
                 return View(model);
             }
 
-            string username = result.username ?? "UnknownUser";
-            string role = string.IsNullOrEmpty(result.role) ? "User" : result.role;
-
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, username),
-        new Claim(ClaimTypes.Role, role)
-    };
+            {
+                new Claim(ClaimTypes.Name, result.username ?? "UnknownUser"),
+                new Claim(ClaimTypes.Email, result.email ?? ""),
+                new Claim(ClaimTypes.Role, string.IsNullOrEmpty(result.role) ? "User" : result.role),
+                new Claim(ClaimTypes.NameIdentifier, result.userId.ToString())
+            };
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
             var principal = new ClaimsPrincipal(identity);
@@ -78,13 +77,14 @@ namespace FE.Controllers
                 }
             );
 
-            return role switch
+            return result.role switch
             {
                 "Admin" => RedirectToAction("Dashboard", "Admin"),
                 "Teacher" => RedirectToAction("Dashboard", "Employee"),
                 "Student" => RedirectToAction("Dashboard", "Student"),
                 _ => RedirectToAction("Index", "Home")
             };
+
         }
 
         [Authorize]
