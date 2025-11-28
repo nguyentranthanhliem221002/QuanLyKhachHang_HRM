@@ -163,6 +163,7 @@
 //        }
 //    }
 //}
+
 using BE.Data;
 using BE.Dtos.Requests;
 using BE.Models;
@@ -190,9 +191,6 @@ namespace BE.Controllers
             _context = context;
         }
 
-
-        // 🔹 Lấy tất cả user (học viên + nhân viên)
-        // ===========================
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -220,9 +218,7 @@ namespace BE.Controllers
 
             return Ok(list);
         }
-        // ===========================
-        // 🔹 Tạo học viên
-        // ===========================// ===========================
+ 
         [HttpPost("students")]
         public async Task<IActionResult> CreateStudent([FromBody] CreateStudentRequest req)
         {
@@ -302,6 +298,8 @@ namespace BE.Controllers
             user.FullName = req.FullName;
             user.Email = req.Email;
             user.DateOfBirth = req.DateOfBirth;
+            user.Phone = req.Phone;
+
 
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
@@ -343,9 +341,6 @@ namespace BE.Controllers
             return Ok(new { message = $"Đã xóa học viên {user.FullName} thành công" });
         }
 
-        // ===========================
-        // 🔹 Tạo nhân viên
-        // ===========================
         [HttpPost("employees")]
         public async Task<IActionResult> CreateEmployee([FromBody] CreateEmployeeRequest req)
         {
@@ -388,7 +383,6 @@ namespace BE.Controllers
             return Ok(new { message = $"Tạo nhân viên {req.FullName} thành công" });
         }
 
-        // 🔹 Lấy nhân viên theo ID
         [HttpGet("employees/{id:guid}")]
         public async Task<IActionResult> GetEmployeeById(Guid id)
         {
@@ -405,7 +399,8 @@ namespace BE.Controllers
                 user.FullName,
                 user.Email,
                 user.UserName,
-                user.EmployeeProfile.Phone,
+                user.Phone,
+                user.DateOfBirth,
                 user.EmployeeProfile.Position,
                 user.EmployeeProfile.Level,
                 user.EmployeeProfile.Salary,
@@ -456,6 +451,7 @@ namespace BE.Controllers
             user.FullName = req.FullName;
             user.Email = req.Email;
             user.IsActive = req.Status == 1;
+            user.Phone = req.Phone;
 
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
@@ -465,7 +461,6 @@ namespace BE.Controllers
             var employee = await _context.Employees.FirstOrDefaultAsync(e => e.UserId == id);
             if (employee != null)
             {
-                employee.Phone = req.Phone;
                 employee.Position = req.Position;
                 employee.Level = req.Level;
                 employee.Salary = req.Salary;
@@ -476,9 +471,6 @@ namespace BE.Controllers
             return Ok(new { message = $"Cập nhật nhân viên {req.FullName} thành công" });
         }
 
-        // ===========================
-        // 🔹 Xóa nhân viên
-        // ===========================
         [HttpDelete("employees/{id:guid}")]
         public async Task<IActionResult> DeleteEmployee(Guid id)
         {
@@ -537,11 +529,13 @@ namespace BE.Controllers
                 user.FullName,
                 user.Email,
                 user.UserName,
+                user.Phone,
+                user.DateOfBirth,
                 user.StudentProfile.Grade,
                 user.StudentProfile.Level,
                 user.StudentProfile.Status,
                 user.StudentProfile.ClassName,
-                user.StudentProfile.EnrollmentDate
+                user.StudentProfile.EnrollmentDate,
             };
 
             return Ok(student);
@@ -582,6 +576,8 @@ namespace BE.Controllers
                 u.FullName,
                 u.Email,
                 u.StudentProfile.Grade,
+                u.Phone,
+                u.DateOfBirth,
                 u.StudentProfile.EnrollmentDate,
                 u.StudentProfile.Level,
                 u.StudentProfile.Status,

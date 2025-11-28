@@ -37,9 +37,13 @@
             <th>Mức học</th>
             <th>Môn học</th>
             <th>Giá</th>
+            <th>Mô tả</th>
+            <th>Ngày bắt đầu</th>
+            <th>Ngày kết thúc</th>
             <th>Thao tác</th>
         </tr>
     </thead>
+
     <tbody></tbody>
 </table>
 
@@ -146,6 +150,9 @@
             list.forEach((c, index) => {
                 const tr = document.createElement('tr');
                 const subjectName = subjects.find(s => s.id == c.subjectId)?.name ?? '';
+                      const start = c.startDate ? new Date(c.startDate).toLocaleDateString('vi-VN') : '';
+                const end = c.endDate ? new Date(c.endDate).toLocaleDateString('vi-VN') : '';
+
                 tr.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${c.title}</td>
@@ -153,10 +160,14 @@
                     <td>${c.level}</td>
                     <td>${subjectName}</td>
                     <td>${c.fee?.toLocaleString('vi-VN')} đ</td>
+                    <td>${c.description ?? ''}</td>
+                    <td>${start}</td>
+                    <td>${end}</td>
                     <td>
                         <button class="btn btn-warning btn-sm" onclick="editCourse('${c.id}')">Sửa</button>
                         <button class="btn btn-danger btn-sm" onclick="deleteCourse('${c.id}')">Xóa</button>
                     </td>`;
+
                 fragment.appendChild(tr);
             });
             tbody.appendChild(fragment);

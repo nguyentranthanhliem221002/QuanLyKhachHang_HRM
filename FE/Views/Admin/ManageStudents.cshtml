@@ -36,6 +36,8 @@
             <th>#</th>
             <th>Họ và tên</th>
             <th>Email</th>
+            <th>Số điện thoại</th>     <!-- Thêm -->
+            <th>Ngày sinh</th>         <!-- Thêm -->
             <th>Lớp</th>
             <th>Mức học</th>
             <th>Ngày nhập học</th>
@@ -43,6 +45,7 @@
             <th>Thao tác</th>
         </tr>
     </thead>
+
     <tbody></tbody>
 </table>
 
@@ -133,18 +136,22 @@
                 const statusText = stu.status == 1 ? "Approved" : "Pending";
                 const enrollment = stu.enrollmentDate ? new Date(stu.enrollmentDate).toLocaleDateString() : '';
 
-                tr.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${stu.fullName}</td>
-                    <td>${stu.email}</td>
-                    <td>${grade}</td>
-                    <td>${level}</td>
-                    <td>${enrollment}</td>
-                    <td>${statusText}</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm" onclick="editStudent('${stu.id}')">Sửa</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteStudent('${stu.id}')">Xóa</button>
-                    </td>`;
+                      tr.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${stu.fullName}</td>
+                        <td>${stu.email}</td>
+                        <td>${stu.phone ?? ''}</td>
+                        <td>${stu.dateOfBirth ? new Date(stu.dateOfBirth).toLocaleDateString() : ''}</td>
+                        <td>${grade}</td>
+                        <td>${level}</td>
+                        <td>${enrollment}</td>
+                        <td>${statusText}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="editStudent('${stu.id}')">Sửa</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteStudent('${stu.id}')">Xóa</button>
+                        </td>
+                    `;
+
                 tbody.appendChild(tr);
             });
         }

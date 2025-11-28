@@ -2,7 +2,6 @@
 using BE.Dtos;
 using BE.Dtos.Requests;
 using BE.Models;
-using FE.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -133,6 +132,8 @@ namespace BE.Controllers
                     Title = c.Title,
                     Description = c.Description,
                     Fee = c.Fee,
+                    Level = c.Level,
+                    Grade = c.Grade,
                     StartDate = c.StartDate,
                     EndDate = c.EndDate,
                     SubjectId = c.SubjectId,

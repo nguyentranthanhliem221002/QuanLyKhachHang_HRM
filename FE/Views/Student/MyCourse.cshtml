@@ -12,7 +12,7 @@
         <thead>
             <tr>
                 <th>Tên khóa học</th>
-                <th>Giảng viên</th>
+                <th>Môn học</th>
                 <th>Thời gian</th>
                 <th>Trạng thái thanh toán</th>
                 <th>Giá khóa học</th>
@@ -36,6 +36,8 @@
                         else
                         {
                             <a asp-controller="Payment" asp-action="Details" asp-route-id="@course.Id" class="btn btn-success btn-sm">Xem thanh toán</a>
+                            @* <a asp-controller="Payment" asp-action="Details" asp-route-orderId="@course.TransactionId" class="btn btn-success btn-sm">Xem thanh toán</a> *@
+
                         }
                     </td>
 

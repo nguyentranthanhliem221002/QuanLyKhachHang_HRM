@@ -328,6 +328,33 @@ namespace BE.Controllers
             return Ok(model);
         }
 
+        //[HttpGet("details/{orderId}/{userId}")]
+        //public async Task<IActionResult> GetPaymentDetails(string orderId, Guid userId)
+        //{
+        //    var payment = await _context.Payments
+        //        .Include(p => p.Course)
+        //        .FirstOrDefaultAsync(p => p.OrderId == orderId && p.UserId == userId);
+
+        //    if (payment == null)
+        //        return NotFound();
+
+        //    var model = new PaymentDTO
+        //    {
+        //        UserId = payment.UserId,
+        //        CourseId = payment.CourseId,
+        //        CourseTitle = payment.Course.Title,
+        //        SubjectName = payment.Course.SubjectName,
+        //        Fee = payment.Amount,
+        //        IsPaid = payment.IsPaid,
+        //        PaymentDate = payment.CreatedAt,
+        //        TransactionId = payment.OrderId,
+        //        StartDate = payment.Course.StartDate,
+        //        EndDate = payment.Course.EndDate
+        //    };
+
+        //    return Ok(model);
+        //}
+
         private string SignHmacSHA256(string message, string key)
         {
             using var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(key));

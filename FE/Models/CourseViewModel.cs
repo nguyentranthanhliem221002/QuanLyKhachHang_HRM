@@ -13,10 +13,10 @@
         public string Grade { get; set; } = string.Empty;
         public string Level { get; set; } = string.Empty;
 
-        // Trạng thái thanh toán dùng hiển thị ở FE
         public bool IsPaid { get; set; } = false;
 
-        // Thêm OrderId để FE biết đơn thanh toán MoMo
         public string? OrderId { get; set; }
+        public string? TransactionId { get; set; }
+
     }
 }

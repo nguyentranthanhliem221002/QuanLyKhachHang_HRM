@@ -88,7 +88,6 @@ namespace FE.Services
         {
             try
             {
-                // Gọi backend API để lấy chi tiết thanh toán
                 var response = await _http.GetFromJsonAsync<PaymentViewModel>($"api/payment/details/{courseId}/{userId}");
                 return response;
             }
@@ -98,6 +97,20 @@ namespace FE.Services
                 return null;
             }
         }
+        //public async Task<PaymentViewModel?> GetPaymentDetailsAsync(string orderId, Guid userId)
+        //{
+        //    try
+        //    {
+        //        var response = await _http.GetFromJsonAsync<PaymentViewModel>($"api/payment/details/{orderId}/{userId}");
+        //        return response;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("GetPaymentDetailsAsync exception: " + ex.Message);
+        //        return null;
+        //    }
+        //}
+
 
     }
 }

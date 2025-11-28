@@ -69,7 +69,7 @@ public class PaymentController : Controller
 
         return RedirectToAction("MyCourse", "Student");
     }
-    public async Task<IActionResult> Details(Guid id) // id là CourseId
+    public async Task<IActionResult> Details(Guid id)
     {
         var userId = new Guid(User.FindFirstValue(ClaimTypes.NameIdentifier));
         var payment = await _paymentService.GetPaymentDetailsAsync(id, userId);
@@ -78,6 +78,16 @@ public class PaymentController : Controller
 
         return View(payment);
     }
+    //public async Task<IActionResult> Details(string orderId)
+    //{
+    //    var userId = new Guid(User.FindFirstValue(ClaimTypes.NameIdentifier));
+    //    var payment = await _paymentService.GetPaymentDetailsAsync(orderId, userId);
+    //    if (payment == null)
+    //        return NotFound();
+
+    //    return View(payment);
+    //}
+
     public async Task<IActionResult> History()
     {
         var userId = new Guid(User.FindFirstValue(ClaimTypes.NameIdentifier));
@@ -101,7 +111,7 @@ public class PaymentController : Controller
                     StartDate = course.StartDate,
                     EndDate = course.EndDate,
                     TransactionId = p.OrderId,
-                    PaymentDate = DateTime.Now // hoặc p.CreatedAt nếu FE có truyền
+                    PaymentDate = DateTime.Now 
                 });
             }
         }

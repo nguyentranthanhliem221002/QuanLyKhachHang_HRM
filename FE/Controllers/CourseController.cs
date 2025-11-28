@@ -74,7 +74,7 @@ namespace FE.Controllers
             if (success)
                 TempData["Success"] = "Đăng ký thành công!";
             else
-                TempData["Error"] = "Đăng ký thất bại!";
+                TempData["Error"] = "Môn học hiện này đã được đăng ký trước đó!";
 
             return RedirectToAction(nameof(Register));
         }
