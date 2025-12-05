@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
 @using System.Security.Claims
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 
 @{
     var user = HttpContextAccessor.HttpContext?.User;
@@ -8,11 +9,30 @@
     var username = isAuthenticated ? user.Identity.Name : null;
     var role = user?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
-    string apiUrl = Environment.GetEnvironmentVariable("API_URL_DOCKER")
-                    ?? Environment.GetEnvironmentVariable("API_URL_CLIENT")
-                    ?? ViewBag.ApiUrl
-                    ?? "https://localhost:51745";
+    // Xác định API URL dựa trên môi trường
+    string apiUrl;
+    var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
 
+    if (environment == "Production")
+    {
+        // Production: Dùng IP public của BE server
+        apiUrl = Environment.GetEnvironmentVariable("API_URL_CLIENT")
+                 ?? Configuration["BackendApi:BaseUrl"]
+                 ?? "https://98.95.20.86:5000";
+    }
+    else if (environment == "Docker")
+    {
+        // Docker local: Dùng container name (server-side calls)
+        // hoặc IP public (client-side calls từ browser)
+        apiUrl = Environment.GetEnvironmentVariable("API_URL_CLIENT")
+                 ?? "https://98.95.20.86:5000";
+    }
+    else
+    {
+        // Development: Dùng localhost
+        apiUrl = Configuration["BackendApi:BaseUrl"]
+                 ?? "https://localhost:51745";
+    }
 }
 
 <!DOCTYPE html>
@@ -174,7 +194,10 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Expose API URL to client-side JavaScript
         window.API_URL = "@apiUrl";
+        window.ENVIRONMENT = "@environment";
+        console.log("🌍 Environment:", window.ENVIRONMENT);
         console.log("✅ API_URL:", window.API_URL);
     </script>
     <script src="~/js/api.js"></script>

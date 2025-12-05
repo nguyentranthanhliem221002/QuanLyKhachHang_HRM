@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
 
 // ===========================================
-// 1️⃣ Kestrel config cho Docker
+// 1️⃣ Kestrel config
 // ===========================================
-if (builder.Environment.EnvironmentName == "Docker")
+if (builder.Environment.IsProduction() || builder.Environment.EnvironmentName == "Docker")
 {
     builder.WebHost.ConfigureKestrel(options =>
     {
-        options.ListenAnyIP(8080); // HTTP nội bộ
+        options.ListenAnyIP(8080); // HTTP
         options.ListenAnyIP(443, listenOptions =>
         {
             listenOptions.UseHttps("/https/aspnetapp.pfx", "123456");
@@ -20,23 +20,32 @@ if (builder.Environment.EnvironmentName == "Docker")
     });
 }
 
-
+// Load configuration
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
+// Database
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-
+// CORS - lấy danh sách FE URLs từ config
 var feUrls = builder.Configuration.GetSection("Frontend:Urls").Get<string[]>()
-             ?? new[] { "https://localhost:51746", "https://localhost:51745", "https://localhost:5001", "https://localhost:5000", "https://98.95.20.86:5001", "https://98.95.20.86:5000" };
+             ?? new[] {
+                 "https://localhost:51746",
+                 "http://localhost:51746",
+                 "https://13.223.107.213:5001",
+                 "http://13.223.107.213:8080"
+             };
+
+Console.WriteLine($"🔥 CORS Allowed Origins: {string.Join(", ", feUrls)}");
 
 builder.Services.AddCors(options =>
 {
@@ -55,6 +64,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Database initialization
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -70,7 +80,7 @@ using (var scope = app.Services.CreateScope())
     await DbInitializer.InitializeAsync(db, userManager, roleManager);
 }
 
-
+// Middleware
 if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Docker" || app.Environment.IsProduction())
 {
     app.UseSwagger();
@@ -81,6 +91,7 @@ app.UseHttpsRedirection();
 app.UseCors("AllowFE");
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
+
+Console.WriteLine($"🚀 BE is running in {app.Environment.EnvironmentName} mode");
 app.Run();

@@ -1,0 +1,24 @@
+﻿services:
+  fe:
+    build:
+      context: .
+      dockerfile: ./FE/Dockerfile_FE
+    container_name: fe
+    ports:
+      - "5001:443"
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "${ASPNETCORE_ENVIRONMENT}"
+      ASPNETCORE_URLS: "${ASPNETCORE_URLS}"
+      ASPNETCORE_Kestrel__Certificates__Default__Path: "${ASPNETCORE_Kestrel__Certificates__Default__Path}"
+      ASPNETCORE_Kestrel__Certificates__Default__Password: "${ASPNETCORE_Kestrel__Certificates__Default__Password}"
+      API_URL_CLIENT: "${API_URL_CLIENT}"
+    volumes:
+      - ./https:/https:ro
+    networks:
+      - fe-network
+    restart: unless-stopped
+
+networks:
+  fe-network:
+    driver: bridge

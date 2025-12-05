@@ -1,14 +1,12 @@
 ﻿using FE.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 
-
+// Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
@@ -17,7 +15,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
     });
 
-
+// Session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -26,24 +24,40 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-
-
+// Load configuration
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
     .AddEnvironmentVariables();
 
+// Determine Backend URL
+string backendUrl;
 
-var backendUrl = builder.Environment.EnvironmentName == "Docker"
-    ? Environment.GetEnvironmentVariable("API_URL_SERVER")    // FE container gọi BE container
-    : Environment.GetEnvironmentVariable("API_URL_CLIENT")      // FE ngoài container, trình duyệt gọi IP public
-      ?? builder.Configuration["BackendApi:BaseUrl"]
-      ?? "https://localhost:51745";
+if (builder.Environment.IsProduction())
+{
+    // Production: Dùng IP public của BE server
+    backendUrl = Environment.GetEnvironmentVariable("API_URL_CLIENT")
+                 ?? builder.Configuration["BackendApi:BaseUrl"]
+                 ?? "https://98.95.20.86:5000";
+}
+else if (builder.Environment.EnvironmentName == "Docker")
+{
+    // Docker local: Dùng container name
+    backendUrl = Environment.GetEnvironmentVariable("API_URL_SERVER")
+                 ?? "https://be:443";
+}
+else
+{
+    // Development: Dùng localhost
+    backendUrl = builder.Configuration["BackendApi:BaseUrl"]
+                 ?? "https://localhost:51745";
+}
 
+Console.WriteLine($"👉 Environment: {builder.Environment.EnvironmentName}");
 Console.WriteLine($"👉 Backend API Base URL: {backendUrl}");
 
-
+// Configure HttpClient
 Action<HttpClient> configureClient = client => client.BaseAddress = new Uri(backendUrl);
 Func<HttpMessageHandler> configureHandler = () => new HttpClientHandler
 {
@@ -58,9 +72,9 @@ builder.Services.AddHttpClient<TestService>(configureClient).ConfigurePrimaryHtt
 builder.Services.AddHttpClient<CourseService>(configureClient).ConfigurePrimaryHttpMessageHandler(configureHandler);
 builder.Services.AddHttpClient<PaymentService>(configureClient).ConfigurePrimaryHttpMessageHandler(configureHandler);
 
-
 var app = builder.Build();
 
+// Middleware
 if (app.Environment.IsDevelopment() || app.Environment.EnvironmentName == "Docker")
 {
     app.UseDeveloperExceptionPage();
@@ -73,16 +87,14 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthentication();
 app.UseSession();
 app.UseAuthorization();
-
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+Console.WriteLine($"🚀 FE is running in {app.Environment.EnvironmentName} mode");
 app.Run();
