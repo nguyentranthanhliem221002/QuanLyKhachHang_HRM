@@ -1,20 +1,21 @@
-﻿# Stage 1: Base image
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 WORKDIR /app
 EXPOSE 443
 EXPOSE 8080
-COPY https /https   
+COPY https /https
 
-# Stage 2: Build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["BE/BE.csproj", "./"]
-RUN dotnet restore "BE.csproj"
-COPY BE/. .      
-RUN dotnet publish "BE.csproj" -c Release -o /app/publish
+COPY BE/BE.csproj ./BE.csproj
+RUN dotnet restore BE.csproj
+COPY BE/. .
+RUN dotnet publish BE.csproj -c Release -o /app/publish
 
-# Stage 3: Final
 FROM base AS final
 WORKDIR /app
+
+COPY BE/appsettings.json ./appsettings.json
+COPY BE/appsettings.Production.json ./appsettings.Production.json
+
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "BE.dll"]

@@ -4,13 +4,11 @@
     container_name: sqlserver
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "${SA_PASSWORD}"
+      SA_PASSWORD: ${SA_PASSWORD}
     ports:
       - "1433:1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
-    networks:
-      - be-network
     restart: unless-stopped
 
   be:
@@ -21,23 +19,13 @@
     ports:
       - "5000:443"
       - "8080:8080"
-    environment:
-      ASPNETCORE_ENVIRONMENT: "${ASPNETCORE_ENVIRONMENT}"
-      ASPNETCORE_URLS: "${ASPNETCORE_URLS}"
-      ASPNETCORE_Kestrel__Certificates__Default__Path: "${ASPNETCORE_Kestrel__Certificates__Default__Path}"
-      ASPNETCORE_Kestrel__Certificates__Default__Password: "${ASPNETCORE_Kestrel__Certificates__Default__Password}"
-      ConnectionStrings__DefaultConnection: "Server=${DB_HOST},${DB_PORT};Database=${DB_NAME};User Id=${DB_USER};Password=${SA_PASSWORD};TrustServerCertificate=True;"
+    env_file:
+      - .env
     volumes:
       - ./https:/https:ro
     depends_on:
       - sqlserver
-    networks:
-      - be-network
     restart: unless-stopped
 
 volumes:
   sqlserver_data:
-
-networks:
-  be-network:
-    driver: bridge
