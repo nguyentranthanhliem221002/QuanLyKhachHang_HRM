@@ -48,6 +48,31 @@ DB_USER=sa
 SA_PASSWORD=Abc12345!
 
 
+#### .env-fe
+ASPNETCORE_ENVIRONMENT=Production
+ASPNETCORE_URLS=https://+:443;http://+:8080
+
+ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+ASPNETCORE_Kestrel__Certificates__Default__Password=123456
+
+BackendApi__BaseUrl=https://98.95.20.86:5000
+
+#### .env-be
+ASPNETCORE_ENVIRONMENT=Production
+ASPNETCORE_URLS=https://+:443;http://+:8080
+
+ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+ASPNETCORE_Kestrel__Certificates__Default__Password=123456
+
+DB_HOST=sqlserver
+DB_PORT=1433
+DB_NAME=HeThongQLKH_DB
+DB_USER=sa
+SA_PASSWORD=Abc12345!
+
+ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=HeThongQLKH_DB;User Id=sa;Password=Abc12345!;TrustServerCertificate=True;
+
+
 # 8️⃣ Cấu hình chuỗi kết nối trong appsettings.json (BE)
 "ConnectionStrings": {
   "DefaultConnection": "Server=sqlserver,1433;Database=HeThongQLKH_DB;User Id=sa;Password=Abc12345!;TrustServerCertificate=True;"
