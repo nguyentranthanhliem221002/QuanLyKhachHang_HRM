@@ -12,10 +12,6 @@ namespace BE.Data
             RoleManager<IdentityRole<Guid>> roleManager)
         {
 
-
-            // =======================
-            // 1️⃣ Seed Roles
-            // =======================
             string[] roles = { "Admin", "Teacher", "Student" };
             foreach (var role in roles)
             {
@@ -23,25 +19,25 @@ namespace BE.Data
                     await roleManager.CreateAsync(new IdentityRole<Guid>(role));
             }
 
-            // =======================
-            // 2️⃣ Seed Users + Profiles
-            // =======================
+
             if (!await userManager.Users.AnyAsync())
             {
-                var users = new List<(string username, string email, string fullname, string password, string role)>
+                var users = new List<(string username, string email, string fullname, string password, string role, string phone, DateTime dob)>
                 {
-                    ("admin", "admin@local", "Admin System", "Admin123!", "Admin"),
-                    ("teacher1", "teacher@local", "Thầy A", "Teach123!", "Teacher"),
-                    ("student1", "student@local", "Sinh viên A", "Stud123!", "Student")
+                    ("admin", "admin@local", "Admin System", "Admin123!", "Admin", "0900000000", new DateTime(1990,1,1)),
+                    ("teacher1", "teacher@local", "Thầy A", "Teach123!", "Teacher", "0911111111", new DateTime(1985,5,20)),
+                    ("student1", "student@local", "Sinh viên A", "Stud123!", "Student", "0922222222", new DateTime(2007,3,15))
                 };
 
-                foreach (var (username, email, fullname, password, role) in users)
+                foreach (var (username, email, fullname, password, role, phone, dob) in users)
                 {
                     var user = new User
                     {
                         UserName = username,
                         Email = email,
                         FullName = fullname,
+                        Phone = phone,
+                        DateOfBirth = dob,
                         EmailConfirmed = true,
                         IsActive = true,
                         RoleType = role
@@ -58,12 +54,13 @@ namespace BE.Data
 
                     await userManager.AddToRoleAsync(user, role);
 
+                    // Seed Employee
                     if (role == "Teacher")
                     {
                         var employee = new Employee
                         {
                             UserId = user.Id,
-                            Phone = "0123456789",
+                            Phone = phone,
                             Position = "Giáo viên Toán",
                             Level = "Senior",
                             Salary = 1500,
@@ -72,6 +69,7 @@ namespace BE.Data
                         };
                         context.Employees.Add(employee);
                     }
+                    // Seed Student
                     else if (role == "Student")
                     {
                         var student = new Student
@@ -93,9 +91,7 @@ namespace BE.Data
                 await context.SaveChangesAsync();
             }
 
-            // =======================
-            // 3️⃣ Seed Subjects
-            // =======================
+
             if (!await context.Subjects.AnyAsync())
             {
                 var subjects = new List<Subject>
@@ -113,9 +109,7 @@ namespace BE.Data
                 Console.WriteLine("✅ Đã seed dữ liệu môn học.");
             }
 
-            // =======================
-            // 4️⃣ Seed Questions
-            // =======================
+
             if (!await context.Questions.AnyAsync())
             {
                 var subjects = await context.Subjects

@@ -19,8 +19,8 @@ namespace FE.Services
         {
             var response = await _http.PostAsJsonAsync("api/auth/login", new
             {
-                UserName = model.UserName,   // ✅ giống hệt property trong LoginRequest
-                Password = model.Password     // ✅ giống hệt property trong LoginRequest
+                UserName = model.UserName,   
+                Password = model.Password     
             });
 
 
@@ -30,9 +30,7 @@ namespace FE.Services
             return await response.Content.ReadFromJsonAsync<LoginResult>();
         }
 
-        // ======================================================
-        // 🔹 Đăng ký tài khoản
-        // ======================================================
+    
         public async Task<string?> RegisterAsync(UserViewModel model)
         {
             var response = await _http.PostAsJsonAsync("api/auth/register", new
@@ -42,8 +40,8 @@ namespace FE.Services
                 fullName = model.FullName,
                 password = model.Password,
                 confirmPassword = model.ConfirmPassword,
-                role = model.RoleType,          // ✅ trùng key Swagger
-                className = model.ClassName,
+                //role = model.RoleType,         
+                //className = model.ClassName,
                 enrollmentDate = model.EnrollmentDate,
                 status = model.Status
             });

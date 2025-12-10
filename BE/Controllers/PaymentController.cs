@@ -328,32 +328,40 @@ namespace BE.Controllers
             return Ok(model);
         }
 
-        //[HttpGet("details/{orderId}/{userId}")]
-        //public async Task<IActionResult> GetPaymentDetails(string orderId, Guid userId)
-        //{
-        //    var payment = await _context.Payments
-        //        .Include(p => p.Course)
-        //        .FirstOrDefaultAsync(p => p.OrderId == orderId && p.UserId == userId);
+        [HttpGet("list")]
+        public async Task<IActionResult> GetAllPayments()
+        {
+            var payments = await _context.Payments
+                .Include(p => p.Course)
+                .Include(p => p.User)
+                .Select(p => new PaymentDTO
+                {
+                    UserId = p.UserId,
+                    CourseId = p.CourseId,
+                    FullName = p.User.FullName,
+                    Email = p.User.Email,
+                    Phone = p.User.Phone,
+                    Grade = p.Course.Grade,
+                    Level = p.Course.Level,
 
-        //    if (payment == null)
-        //        return NotFound();
+                    // dữ liệu thanh toán
+                    IsPaid = p.IsPaid,
+                    Fee = p.Amount,
+                    TransactionId = p.OrderId,
+                    PaymentDate = p.CreatedAt,
 
-        //    var model = new PaymentDTO
-        //    {
-        //        UserId = payment.UserId,
-        //        CourseId = payment.CourseId,
-        //        CourseTitle = payment.Course.Title,
-        //        SubjectName = payment.Course.SubjectName,
-        //        Fee = payment.Amount,
-        //        IsPaid = payment.IsPaid,
-        //        PaymentDate = payment.CreatedAt,
-        //        TransactionId = payment.OrderId,
-        //        StartDate = payment.Course.StartDate,
-        //        EndDate = payment.Course.EndDate
-        //    };
+                    // dữ liệu khoá học
+                    CourseTitle = p.Course.Title,
+                    SubjectName = p.Course.SubjectName,
+                    StartDate = p.Course.StartDate,
+                    EndDate = p.Course.EndDate
+                })
+                .ToListAsync();
 
-        //    return Ok(model);
-        //}
+            return Ok(payments);
+        }
+
+
 
         private string SignHmacSHA256(string message, string key)
         {

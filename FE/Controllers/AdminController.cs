@@ -13,11 +13,15 @@ namespace FE.Controllers
         private readonly UserService _userService;
         private readonly AdminService _adminService;
 
-        public AdminController(UserService userService, AdminService adminService)
+        private readonly PaymentService _paymentService;
+
+        public AdminController(UserService userService, AdminService adminService, PaymentService paymentService)
         {
             _userService = userService;
             _adminService = adminService;
+            _paymentService = paymentService;
         }
+
 
         public async Task<IActionResult> Dashboard()
         {
@@ -43,6 +47,11 @@ namespace FE.Controllers
         }
 
         public IActionResult ManageCourses() => View();
-        public IActionResult ManagePayments() => View();
+        public async Task<IActionResult> ManagePayments()
+        {
+            var payments = await _paymentService.GetAllPaymentsAsync();
+            return View(payments); // Truyền list sang View
+        }
+
     }
 }

@@ -12,5 +12,11 @@
         public string? TransactionId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public string FullName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+
+        public string Grade { get; set; } = string.Empty;
+        public string Level { get; set; } = string.Empty;
     }
 }

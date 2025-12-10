@@ -10,6 +10,8 @@ namespace BE.Models
         public string Grade { get; set; } = string.Empty;   // thêm
         public string Level { get; set; } = string.Empty;   // thêm
         public DateTime EnrollmentDate { get; set; }
+        public string Phone { get; set; } = string.Empty;
+
         public int Status { get; set; }
 
         // Liên kết 1-1 đến User

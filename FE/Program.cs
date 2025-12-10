@@ -181,5 +181,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-Console.WriteLine($"🚀 FE is running in {app.Environment.EnvironmentName} mode");
+//Console.WriteLine($"🚀 FE is running in {app.Environment.EnvironmentName} mode");
 app.Run();

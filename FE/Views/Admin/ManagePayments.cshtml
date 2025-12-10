@@ -1,10 +1,13 @@
-﻿@{
+﻿@model IEnumerable<FE.Models.PaymentViewModel>
+
+@{
     ViewData["Title"] = "Manage Payments Page";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 
-<h2 class="mb-4">Quản lý thanh toán học viên</h2>
+<h2 class="mb-4">Quản lý hóa đơn thanh toán</h2>
 
-<table class="table table-bordered table-striped" id="paymentsTable">
+<table class="table table-bordered table-striped">
     <thead class="table-primary">
         <tr>
             <th>#</th>
@@ -13,35 +16,41 @@
             <th>SĐT</th>
             <th>Lớp</th>
             <th>Mức học</th>
-            <th>Trạng thái thanh toán</th>
+            <th>Giá khóa học</th>
+            <th>Ngày thanh toán</th>
+            <th>Mã giao dịch</th>
+            <th>Trạng thái</th>
         </tr>
     </thead>
+
     <tbody>
-        <!-- Dữ liệu sẽ load từ JS -->
+        @if (Model != null && Model.Any())
+        {
+            int index = 1;
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@index</td>
+                    <td>@item.FullName</td>
+                    <td>@item.Email</td>
+                    <td>@item.Phone</td>
+                    <td>@item.Grade</td>
+                    <td>@item.Level</td>
+                    <td>@string.Format("{0:N0} đ", item.Fee)</td>
+                    <td>@item.PaymentDate?.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@item.TransactionId</td>
+                    <td class="@(item.IsPaid ? "text-success fw-bold" : "text-danger fw-bold")">
+                        @(item.IsPaid ? "Đã thanh toán" : "Chưa thanh toán")
+                    </td>
+                </tr>
+                index++;
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="10" class="text-center text-danger fw-bold">Không có hóa đơn nào để hiển thị</td>
+            </tr>
+        }
     </tbody>
 </table>
-
-<script>
-    const payments = [
-        { fullName: "Nguyễn Văn A", email: "a@example.com", phone: "0901234567", grade: "10", level: "Trung bình", status: "Pending" },
-        { fullName: "Trần Thị B", email: "b@example.com", phone: "0902345678", grade: "11", level: "Khá", status: "Paid" },
-        { fullName: "Lê Văn C", email: "c@example.com", phone: "0903456789", grade: "12", level: "Giỏi", status: "Pending" },
-        { fullName: "Phạm Thị D", email: "d@example.com", phone: "0904567890", grade: "10", level: "Khá", status: "Rejected" },
-        { fullName: "Hoàng Văn E", email: "e@example.com", phone: "0905678901", grade: "11", level: "Trung bình", status: "Paid" }
-    ];
-
-    const tbody = document.querySelector('#paymentsTable tbody');
-    payments.forEach((item, index) => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${index + 1}</td>
-            <td>${item.fullName}</td>
-            <td>${item.email}</td>
-            <td>${item.phone}</td>
-            <td>${item.grade}</td>
-            <td>${item.level}</td>
-            <td>${item.status}</td>
-        `;
-        tbody.appendChild(tr);
-    });
-</script>

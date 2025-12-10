@@ -111,6 +111,11 @@ namespace FE.Services
         //    }
         //}
 
+        public async Task<List<PaymentViewModel>> GetAllPaymentsAsync()
+        {
+            return await _http.GetFromJsonAsync<List<PaymentViewModel>>("api/payment/list");
+        }
+
 
     }
 }

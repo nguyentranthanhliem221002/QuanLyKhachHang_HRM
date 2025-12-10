@@ -9,6 +9,7 @@
         <div class="col-md-6">
             <div class="card shadow-sm p-4">
                 <h3 class="text-center mb-4">Đăng ký</h3>
+                <input asp-for="RoleType" type="hidden" />
 
                 <form asp-action="Register" method="post">
                     <div class="mb-3">
@@ -40,7 +41,7 @@
                         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
 
-                    <div class="mb-3">
+                    @* <div class="mb-3">
                         <label asp-for="RoleType" class="form-label">Vai trò</label>
                         <select asp-for="RoleType" class="form-select">
                             <option value="">-- Chọn vai trò --</option>
@@ -52,7 +53,7 @@
                     <div class="mb-3">
                         <label asp-for="ClassName" class="form-label">Lớp học</label>
                         <input asp-for="ClassName" class="form-control" />
-                    </div>
+                    </div> *@
 
                     <button type="submit" class="btn btn-primary w-100">Đăng ký</button>
                 </form>

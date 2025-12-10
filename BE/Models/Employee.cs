@@ -5,7 +5,7 @@ namespace BE.Models
     public class Employee
     {
         public Guid Id { get; set; }
-        public string Phone { get; set; } = string.Empty;   // thêm Phone
+        public string Phone { get; set; } = string.Empty;  
         public string Position { get; set; } = string.Empty;
         [Column(TypeName = "decimal(18,3)")]
         public decimal Salary { get; set; }

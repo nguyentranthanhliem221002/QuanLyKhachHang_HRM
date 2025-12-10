@@ -42,10 +42,8 @@ namespace BE.Controllers
             if (!result.Succeeded)
                 return BadRequest(new { message = string.Join(", ", result.Errors.Select(e => e.Description)) });
 
-            // ✅ Gán role mặc định là "Student"
             await _userManager.AddToRoleAsync(user, "Student");
 
-            // ✅ Tạo hồ sơ Student tương ứng
             var student = new Student
             {
                 UserId = user.Id,

@@ -36,7 +36,6 @@ public class PaymentController : Controller
         return View(model);
     }
 
-    // Tạo đơn thanh toán và redirect sang MoMo
     [HttpPost]
     public async Task<IActionResult> Pay(PaymentRequest model)
     {

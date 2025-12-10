@@ -6,6 +6,7 @@ namespace BE.Models
     {
         public int Id { get; set; }
         public Guid UserId { get; set; }
+        public User User { get; set; }  
         public Guid CourseId { get; set; }
 
         [Column(TypeName = "decimal(18,3)")]
