@@ -27,5 +27,34 @@
       - sqlserver
     restart: unless-stopped
 
+  adminer:
+    image: adminer
+    container_name: adminer
+    ports:
+      - "8081:8080"
+    depends_on:
+      - sqlserver
+    restart: unless-stopped
+
+  sqlpad:
+    image: sqlpad/sqlpad:latest
+    container_name: sqlpad
+    ports:
+      - "3001:3000"
+    environment:
+      SQLPAD_ADMIN: "admin"
+      SQLPAD_ADMIN_PASSWORD: "123456"
+
+      SQLPAD_ALLOW_SQLPAD_USER_SIGNUP: "true"
+
+      SQLPAD_WEBAPP_BASE_URL: "http://98.95.20.86:3001"
+
+    depends_on:
+      - sqlserver
+    volumes:
+      - sqlpad_data:/var/lib/sqlpad
+    restart: unless-stopped
+
 volumes:
   sqlserver_data:
+  sqlpad_data:
