@@ -11,7 +11,6 @@ namespace FE.Services
             _httpClient = httpClient;
         }
 
-        // Lấy tất cả môn học
         public async Task<List<SubjectViewModel>> GetAllSubjectsAsync()
         {
             var result = await _httpClient.GetFromJsonAsync<List<SubjectViewModel>>("api/subject");

@@ -43,7 +43,6 @@ namespace BE.Controllers
             var answers = model.Answers;
             var subject = model.Subject;
 
-            // Lấy câu hỏi đúng từ DB
             var correctAnswers = _context.Questions
                 .Where(q => answers.Keys.Contains(q.Id))
                 .ToDictionary(q => q.Id, q => q.CorrectAnswer);

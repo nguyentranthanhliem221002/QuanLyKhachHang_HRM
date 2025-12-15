@@ -18,32 +18,6 @@ namespace BE.Controllers
             _context = context;
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetAllCourses()
-        //{
-        //    var courses = await _context.Courses.Include(c => c.Subject).ToListAsync();
-        //    return Ok(courses);
-        //}
-        //[HttpGet]
-        //public async Task<IActionResult> GetAllCourses()
-        //{
-        //    var courses = await _context.Courses
-        //        .Include(c => c.Subject)
-        //        .Select(c => new CourseDTO
-        //        {
-        //            Id = c.Id,
-        //            Title = c.Title,
-        //            Description = c.Description,
-        //            Fee = c.Fee,
-        //            StartDate = c.StartDate,
-        //            EndDate = c.EndDate,
-        //            SubjectId = c.SubjectId,
-        //            SubjectName = c.Subject.Name
-        //        })
-        //        .ToListAsync();
-
-        //    return Ok(courses);
-        //}
         [HttpGet]
         public async Task<IActionResult> GetAllCourses(
             [FromQuery] string? search,
@@ -89,14 +63,6 @@ namespace BE.Controllers
             return Ok(courses);
         }
 
-
-        //[HttpPost]
-        //public async Task<IActionResult> CreateCourse([FromBody] Course course)
-        //{
-        //    _context.Courses.Add(course);
-        //    await _context.SaveChangesAsync();
-        //    return Ok(course);
-        //}
         [HttpPost]
         public async Task<IActionResult> CreateCourse([FromBody] CreateCourseRequest model)
         {
@@ -110,7 +76,7 @@ namespace BE.Controllers
                 Fee = model.Fee,
                 StartDate = model.StartDate,
                 EndDate = model.EndDate,
-                SubjectId = model.SubjectId, // ✅ Nhận SubjectId từ FE
+                SubjectId = model.SubjectId,
                 Grade = model.Grade,
                 Level = model.Level
             };
@@ -147,22 +113,6 @@ namespace BE.Controllers
             return Ok(course);
         }
 
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> UpdateCourse(int id, [FromBody] Course updatedCourse)
-        //{
-        //    var course = await _context.Courses.FindAsync(id);
-        //    if (course == null) return NotFound();
-
-        //    course.Title = updatedCourse.Title;
-        //    course.Description = updatedCourse.Description;
-        //    course.Fee = updatedCourse.Fee;
-        //    course.StartDate = updatedCourse.StartDate;
-        //    course.EndDate = updatedCourse.EndDate;
-        //    course.SubjectId = updatedCourse.SubjectId;
-
-        //    await _context.SaveChangesAsync();
-        //    return Ok(course);
-        //}
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCourse(Guid id, [FromBody] UpdateCourseRequest model)
         {
@@ -227,7 +177,7 @@ namespace BE.Controllers
                 CourseId = model.CourseId,
                 Grade = model.Grade,
                 Level = model.Level,
-                Status = model.Status // 0 = Pending
+                Status = model.Status 
             };
 
             _context.Registrations.Add(registration);

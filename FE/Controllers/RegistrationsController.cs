@@ -58,7 +58,6 @@ namespace FE.Controllers
                 return RedirectToAction(nameof(Register));
             }
 
-            // Redirect thanh toán MoMo
             var payUrl = await _registrationService.PayWithMoMoAsync(model.UserId, model.CourseId, course.Fee);
             return Redirect(payUrl);
         }

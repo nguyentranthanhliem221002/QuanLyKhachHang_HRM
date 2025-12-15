@@ -20,7 +20,7 @@ namespace BE.Controllers
         {
             var totalStudents = await _context.Students.CountAsync(s => s.Status == 0);
             var totalEmployees = await _context.Employees.CountAsync(e => e.Status == 0);
-            var totalCourses = await _context.Courses.CountAsync(); // Nếu không có: đổi thành 0
+            var totalCourses = await _context.Courses.CountAsync(); 
 
             var stats = new
             {

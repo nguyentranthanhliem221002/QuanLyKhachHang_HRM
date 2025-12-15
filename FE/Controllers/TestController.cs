@@ -14,7 +14,6 @@ namespace FE.Controllers
 
         public IActionResult SelectSubject()
         {
-            // Hiển thị danh sách 5 môn có thể test
             var subjects = new[] { "Toán", "Vật lý", "Hóa học", "Sinh học", "Ngữ văn" };
             return View(subjects);
         }

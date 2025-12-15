@@ -14,7 +14,6 @@ namespace FE.Services
             _httpClient = httpClient;
         }
 
-        // Lấy thống kê Dashboard
         public async Task<(int Students, int Employees, int Courses)> GetDashboardStatsAsync()
         {
             var response = await _httpClient.GetFromJsonAsync<DashboardStats>("api/admin/dashboard");

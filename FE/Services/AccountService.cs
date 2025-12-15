@@ -12,9 +12,6 @@ namespace FE.Services
             _http = http;
         }
 
-        // ======================================================
-        // 🔹 Đăng nhập
-        // ======================================================
         public async Task<LoginResult?> LoginAsync(UserViewModel model)
         {
             var response = await _http.PostAsJsonAsync("api/auth/login", new
@@ -53,9 +50,6 @@ namespace FE.Services
             return result?.message;
         }
 
-        // ======================================================
-        // 🔹 Models nội bộ
-        // ======================================================
         public class LoginResult
         {
             public string username { get; set; } = null!;

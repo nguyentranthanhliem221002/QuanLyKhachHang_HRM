@@ -20,10 +20,8 @@
 }
 
 <form asp-action="Register" method="post" class="mx-auto shadow-lg p-4 bg-white rounded-4" style="max-width: 500px;">
-    <!-- Hidden UserId -->
     <input type="hidden" asp-for="UserId" />
 
-    <!-- Chọn lớp -->
     <div class="mb-3">
         <label asp-for="Grade" class="form-label fw-bold">Chọn lớp</label>
         <select asp-for="Grade" class="form-control" id="GradeSelect" required>
@@ -36,7 +34,6 @@
         <span asp-validation-for="Grade" class="text-danger"></span>
     </div>
 
-    <!-- Chọn mức độ -->
     <div class="mb-3">
         <label asp-for="Level" class="form-label fw-bold">Chọn mức độ</label>
         <select asp-for="Level" class="form-control" id="LevelSelect" required>
@@ -49,7 +46,6 @@
         <span asp-validation-for="Level" class="text-danger"></span>
     </div>
 
-    <!-- Chọn môn học -->
     <div class="mb-3">
         <label asp-for="CourseId" class="form-label fw-bold">Chọn môn học</label>
         <select asp-for="CourseId" class="form-control" id="CourseSelect" required>
@@ -92,7 +88,6 @@
             });
         }
 
-        // Lọc môn học theo lớp và mức độ
         const gradeSelect = document.getElementById('GradeSelect');
         const levelSelect = document.getElementById('LevelSelect');
         const courseSelect = document.getElementById('CourseSelect');

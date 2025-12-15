@@ -73,7 +73,6 @@ namespace FE.Services
                     return null;
                 }
 
-                // Backend trả về PaymentRequest đã update
                 var updatedPayment = await response.Content.ReadFromJsonAsync<PaymentRequest>();
                 return updatedPayment;
             }
@@ -97,20 +96,7 @@ namespace FE.Services
                 return null;
             }
         }
-        //public async Task<PaymentViewModel?> GetPaymentDetailsAsync(string orderId, Guid userId)
-        //{
-        //    try
-        //    {
-        //        var response = await _http.GetFromJsonAsync<PaymentViewModel>($"api/payment/details/{orderId}/{userId}");
-        //        return response;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine("GetPaymentDetailsAsync exception: " + ex.Message);
-        //        return null;
-        //    }
-        //}
-
+ 
         public async Task<List<PaymentViewModel>> GetAllPaymentsAsync()
         {
             return await _http.GetFromJsonAsync<List<PaymentViewModel>>("api/payment/list");

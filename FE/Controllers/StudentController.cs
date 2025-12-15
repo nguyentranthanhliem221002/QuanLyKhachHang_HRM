@@ -36,41 +36,6 @@ namespace FE.Controllers
             };
             return View(model);
         }
-        //public async Task<IActionResult> MyCourse()
-        //{
-        //    var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? Guid.Empty.ToString());
-
-        //    // Lấy danh sách payments của user
-        //    var payments = await _paymentService.GetHistoryAsync(userId);
-
-        //    var model = new StudentViewModel
-        //    {
-        //        MyCourses = new List<CourseViewModel>()
-        //    };
-
-        //    foreach (var payment in payments)
-        //    {
-        //        // Lấy thông tin course
-        //        var course = await _courseService.GetCourseByIdAsync(payment.CourseId);
-        //        if (course != null)
-        //        {
-        //            model.MyCourses.Add(new CourseViewModel
-        //            {
-        //                Id = course.Id,
-        //                Title = course.Title,
-        //                SubjectName = course.SubjectName,
-        //                StartDate = course.StartDate,
-        //                EndDate = course.EndDate,
-        //                Fee = payment.Amount,
-        //                IsPaid = payment.IsPaid,
-        //                TransactionId = payment.OrderId // ← đây là quan trọng
-        //            });
-        //        }
-        //    }
-
-        //    return View(model);
-        //}
-
         public IActionResult Feedback() => View();
     }
 }

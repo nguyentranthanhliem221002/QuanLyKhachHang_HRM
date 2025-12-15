@@ -37,20 +37,20 @@ namespace FE.Controllers
         public async Task<IActionResult> ManageStudents()
         {
             var students = await _userService.GetAllStudentsAsync();
-            return View(students); // List<StudentViewModel>
+            return View(students); 
         }
 
         public async Task<IActionResult> ManageEmployees()
         {
             var employees = await _userService.GetAllEmployeesAsync();
-            return View(employees); // List<EmployeeViewModel>
+            return View(employees); 
         }
 
         public IActionResult ManageCourses() => View();
         public async Task<IActionResult> ManagePayments()
         {
             var payments = await _paymentService.GetAllPaymentsAsync();
-            return View(payments); // Truyền list sang View
+            return View(payments); 
         }
 
     }

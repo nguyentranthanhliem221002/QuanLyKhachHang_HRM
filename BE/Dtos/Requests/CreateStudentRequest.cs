@@ -11,9 +11,8 @@ namespace BE.Dtos.Requests
 
         public DateTime? DateOfBirth { get; set; }
 
-        // Thêm các property cần thiết cho controller
-        public DateTime EnrollmentDate { get; set; }  // ngày ghi danh
-        public int Status { get; set; }               // trạng thái học viên
+        public DateTime EnrollmentDate { get; set; }  
+        public int Status { get; set; }              
     }
 
 }

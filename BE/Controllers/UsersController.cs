@@ -1,170 +1,4 @@
-﻿//using BE.Dtos.Requests;
-//using BE.Models;
-//using Microsoft.AspNetCore.Identity;
-//using Microsoft.AspNetCore.Mvc;
-
-//namespace BE.Controllers
-//{
-//    [ApiController]
-//    [Route("api/[controller]")]
-//    public class UsersController : ControllerBase
-//    {
-//        private readonly UserManager<User> _userManager;
-//        private readonly RoleManager<IdentityRole<Guid>> _roleManager;
-
-//        public UsersController(UserManager<User> userManager, RoleManager<IdentityRole<Guid>> roleManager)
-//        {
-//            _userManager = userManager;
-//            _roleManager = roleManager;
-//        }
-
-//        // ===========================
-//        // 🔹 Lấy toàn bộ user
-//        // ===========================
-//        [HttpGet]
-//        public IActionResult GetAll()
-//        {
-//            var users = _userManager.Users.Select(u => new
-//            {
-//                u.Id,
-//                u.UserName,
-//                u.Email,
-//                u.FullName,
-//                u.IsActive
-//            }).ToList();
-
-//            return Ok(users);
-//        }
-
-//        // ===========================
-//        // 🔹 Lấy user theo ID
-//        // ===========================
-//        [HttpGet("{id:guid}")]
-//        public async Task<IActionResult> GetById(Guid id)
-//        {
-//            var user = await _userManager.FindByIdAsync(id.ToString());
-//            if (user == null) return NotFound(new { message = "Không tìm thấy người dùng" });
-
-//            var roles = await _userManager.GetRolesAsync(user);
-
-//            return Ok(new
-//            {
-//                user.Id,
-//                user.UserName,
-//                user.Email,
-//                user.FullName,
-//                user.IsActive,
-//                Roles = roles
-//            });
-//        }
-
-//        // ===========================
-//        // 🔹 Tạo user mới (Admin)
-//        // ===========================
-//        [HttpPost]
-//        public async Task<IActionResult> Create([FromBody] CreateUserRequest req)
-//        {
-//            if (await _userManager.FindByNameAsync(req.UserName) != null)
-//                return BadRequest(new { message = "Tên đăng nhập đã tồn tại" });
-
-//            var user = new User
-//            {
-//                UserName = req.UserName,
-//                Email = req.Email,
-//                FullName = req.FullName,
-//                IsActive = true,
-//                EmailConfirmed = true
-//            };
-
-//            var result = await _userManager.CreateAsync(user, req.Password);
-//            if (!result.Succeeded)
-//                return BadRequest(new { message = string.Join(", ", result.Errors.Select(e => e.Description)) });
-
-//            // Tạo role nếu chưa có
-//            if (!await _roleManager.RoleExistsAsync(req.Role))
-//                await _roleManager.CreateAsync(new IdentityRole<Guid>(req.Role));
-
-//            // Gán role cho user
-//            await _userManager.AddToRoleAsync(user, req.Role);
-
-//            return Ok(new { message = $"Tạo user {req.UserName} thành công với vai trò {req.Role}" });
-//        }
-
-//        // ===========================
-//        // 🔹 Xóa user
-//        // ===========================
-//        [HttpDelete("{id:guid}")]
-//        public async Task<IActionResult> Delete(Guid id)
-//        {
-//            var user = await _userManager.FindByIdAsync(id.ToString());
-//            if (user == null) return NotFound(new { message = "Không tìm thấy người dùng" });
-
-//            var result = await _userManager.DeleteAsync(user);
-//            if (!result.Succeeded)
-//                return BadRequest(new { message = string.Join(", ", result.Errors.Select(e => e.Description)) });
-
-//            return Ok(new { message = $"Đã xóa người dùng {user.UserName} thành công" });
-//        }
-
-//        // ===========================
-//        // 🔹 Lấy danh sách nhân viên
-//        // ===========================
-//        [HttpGet("employees")]
-//        public async Task<IActionResult> GetEmployees()
-//        {
-//            var users = _userManager.Users.ToList();
-//            var employeeList = new List<object>();
-
-//            foreach (var user in users)
-//            {
-//                var roles = await _userManager.GetRolesAsync(user);
-//                if (roles.Contains("Teacher"))
-//                {
-//                    employeeList.Add(new
-//                    {
-//                        user.Id,
-//                        user.FullName,
-//                        user.Email,
-//                        user.UserName,
-//                        Role = "Teacher"
-//                    });
-//                }
-//            }
-
-//            return Ok(employeeList);
-//        }
-
-//        // ===========================
-//        // 🔹 Lấy danh sách học viên
-//        // ===========================
-//        [HttpGet("students")]
-//        public async Task<IActionResult> GetStudents()
-//        {
-//            var users = _userManager.Users.ToList();
-//            var studentList = new List<object>();
-
-//            foreach (var user in users)
-//            {
-//                var roles = await _userManager.GetRolesAsync(user);
-//                if (roles.Contains("Student"))
-//                {
-//                    studentList.Add(new
-//                    {
-//                        user.Id,
-//                        user.FullName,
-//                        user.Email,
-//                        user.UserName,
-//                        Role = "Student"
-//                    });
-//                }
-//            }
-
-//            return Ok(studentList);
-//        }
-//    }
-//}
-
-using BE.Data;
+﻿using BE.Data;
 using BE.Dtos.Requests;
 using BE.Models;
 using Microsoft.AspNetCore.Identity;
@@ -205,7 +39,7 @@ namespace BE.Controllers
                 u.FullName,
                 u.Email,
                 u.UserName,
-                Role = u.RoleType, // "Student" hoặc "Teacher"
+                Role = u.RoleType, 
                 ClassName = u.StudentProfile != null ? u.StudentProfile.ClassName : null,
                 EnrollmentDate = u.StudentProfile != null ? (DateTime?)u.StudentProfile.EnrollmentDate : null,
                 Phone = u.EmployeeProfile != null ? u.EmployeeProfile.Phone : null,
@@ -222,18 +56,27 @@ namespace BE.Controllers
         [HttpPost("students")]
         public async Task<IActionResult> CreateStudent([FromBody] CreateStudentRequest req)
         {
-            if (await _userManager.FindByEmailAsync(req.Email) != null)
+            var normalizedEmail = _userManager.NormalizeEmail(req.Email);
+
+            var emailExists = await _context.Users
+                .AnyAsync(u => u.NormalizedEmail == normalizedEmail);
+
+            if (emailExists)
                 return BadRequest(new { message = "Email đã tồn tại" });
 
             var user = new User
             {
                 UserName = req.Email,
                 Email = req.Email,
+                NormalizedEmail = normalizedEmail,
+                NormalizedUserName = _userManager.NormalizeName(req.Email),
                 FullName = req.FullName,
                 IsActive = true,
                 RoleType = "Student",
                 EmailConfirmed = true,
+                Phone = req.Phone,
             };
+
 
             var result = await _userManager.CreateAsync(user, "Student@1234");
             if (!result.Succeeded)
@@ -248,6 +91,7 @@ namespace BE.Controllers
                 Grade = req.Grade,
                 StudentCode = "SV" + user.Id,
                 Level = req.Level,
+                Phone = req.Phone,
             };
 
             _context.Students.Add(student);
@@ -261,47 +105,29 @@ namespace BE.Controllers
             return Ok(new { message = $"Tạo học viên {req.FullName} thành công" });
         }
 
-
-        // ===========================
-        // 🔹 Sửa học viên
-        // ===========================
-        //[HttpPut("students/{id:guid}")]
-        //public async Task<IActionResult> UpdateStudent(Guid id, [FromBody] CreateStudentRequest req)
-        //{
-        //    var user = await _userManager.FindByIdAsync(id.ToString());
-        //    if (user == null) return NotFound(new { message = "Không tìm thấy học viên" });
-
-        //    user.FullName = req.FullName;
-        //    user.Email = req.Email;
-
-        //    var result = await _userManager.UpdateAsync(user);
-        //    if (!result.Succeeded)
-        //        return BadRequest(new { message = string.Join(", ", result.Errors.Select(e => e.Description)) });
-
-        //    var student = await _context.Students.FirstOrDefaultAsync(s => s.UserId == id);
-        //    if (student != null)
-        //    {
-        //        student.ClassName = req.ClassName;
-        //        student.EnrollmentDate = req.EnrollmentDate;
-        //        await _context.SaveChangesAsync();
-        //    }
-
-        //    return Ok(new { message = $"Cập nhật học viên {req.FullName} thành công" });
-        //}
         [HttpPut("students/{id:guid}")]
         public async Task<IActionResult> UpdateStudent(Guid id, [FromBody] UpdateStudentRequest req)
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null)
                 return NotFound(new { message = "Không tìm thấy học viên" });
+            var normalizedEmail = _userManager.NormalizeEmail(req.Email);
+
+            var emailExists = await _context.Users
+                .AnyAsync(u => u.NormalizedEmail == normalizedEmail && u.Id != id);
+
+            if (emailExists)
+                return BadRequest(new { message = "Email đã tồn tại" });
 
             user.FullName = req.FullName;
             user.Email = req.Email;
-            user.DateOfBirth = req.DateOfBirth;
+            user.UserName = req.Email;
+            user.NormalizedEmail = normalizedEmail;
+            user.NormalizedUserName = _userManager.NormalizeName(req.Email);
             user.Phone = req.Phone;
+            user.DateOfBirth = req.DateOfBirth;
 
-
-            var result = await _userManager.UpdateAsync(user);
+              var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
                 return BadRequest(new { message = string.Join(", ", result.Errors.Select(e => e.Description)) });
 
@@ -320,9 +146,6 @@ namespace BE.Controllers
         }
 
 
-        // ===========================
-        // 🔹 Xóa học viên
-        // ===========================
         [HttpDelete("students/{id:guid}")]
         public async Task<IActionResult> DeleteStudent(Guid id)
         {
@@ -344,20 +167,29 @@ namespace BE.Controllers
         [HttpPost("employees")]
         public async Task<IActionResult> CreateEmployee([FromBody] CreateEmployeeRequest req)
         {
-            if (await _userManager.FindByEmailAsync(req.Email) != null)
+            var normalizedEmail = _userManager.NormalizeEmail(req.Email);
+
+            var emailExists = await _context.Users
+                .AnyAsync(u => u.NormalizedEmail == normalizedEmail);
+
+            if (emailExists)
                 return BadRequest(new { message = "Email đã tồn tại" });
+
 
             var user = new User
             {
                 UserName = req.Email,
                 Email = req.Email,
+                NormalizedEmail = normalizedEmail,
+                NormalizedUserName = _userManager.NormalizeName(req.Email),
                 FullName = req.FullName,
-                IsActive = req.Status == 0,
+                IsActive = true,
+                RoleType = "Employee",
                 EmailConfirmed = true,
-                RoleType = "Teacher",
+                Phone = req.Phone,  
             };
 
-            // Password mặc định cứng
+
             var result = await _userManager.CreateAsync(user, "Teacher@1234");
             if (!result.Succeeded)
                 return BadRequest(new { message = string.Join(", ", result.Errors.Select(e => e.Description)) });
@@ -410,46 +242,26 @@ namespace BE.Controllers
             return Ok(employee);
         }
 
-        // ===========================
-        // 🔹 Sửa nhân viên
-        // ===========================
-        //[HttpPut("employees/{id:guid}")]
-        //public async Task<IActionResult> UpdateEmployee(Guid id, [FromBody] CreateEmployeeRequest req)
-        //{
-        //    var user = await _userManager.FindByIdAsync(id.ToString());
-        //    if (user == null) return NotFound(new { message = "Không tìm thấy nhân viên" });
-
-        //    user.FullName = req.FullName;
-        //    user.Email = req.Email;
-        //    user.IsActive = req.Status == 1;
-
-        //    var result = await _userManager.UpdateAsync(user);
-        //    if (!result.Succeeded)
-        //        return BadRequest(new { message = string.Join(", ", result.Errors.Select(e => e.Description)) });
-
-        //    var employee = await _context.Employees.FirstOrDefaultAsync(e => e.UserId == id);
-        //    if (employee != null)
-        //    {
-        //        employee.Phone = req.Phone;
-        //        employee.Position = req.Position;
-        //        employee.Level = req.Level;
-        //        employee.Salary = req.Salary;
-        //        employee.Status = req.Status;
-        //        await _context.SaveChangesAsync();
-        //    }
-
-        //    return Ok(new { message = $"Cập nhật nhân viên {req.FullName} thành công" });
-        //}
         [HttpPut("employees/{id:guid}")]
         public async Task<IActionResult> UpdateEmployee(Guid id, [FromBody] UpdateEmployeeRequest req)
         {
             var user = await _userManager.FindByIdAsync(id.ToString());
             if (user == null)
                 return NotFound(new { message = "Không tìm thấy nhân viên" });
+            var normalizedEmail = _userManager.NormalizeEmail(req.Email);
 
-            // ✅ Cập nhật thông tin user
+            var emailExists = await _context.Users
+                .AnyAsync(u => u.NormalizedEmail == normalizedEmail && u.Id != id);
+
+            if (emailExists)
+                return BadRequest(new { message = "Email đã tồn tại" });
+
             user.FullName = req.FullName;
             user.Email = req.Email;
+            user.UserName = req.Email;
+
+            user.NormalizedEmail = _userManager.NormalizeEmail(req.Email);
+            user.NormalizedUserName = _userManager.NormalizeName(req.Email);
             user.IsActive = req.Status == 1;
             user.Phone = req.Phone;
 
@@ -457,7 +269,6 @@ namespace BE.Controllers
             if (!result.Succeeded)
                 return BadRequest(new { message = string.Join(", ", result.Errors.Select(e => e.Description)) });
 
-            // ✅ Cập nhật EmployeeProfile
             var employee = await _context.Employees.FirstOrDefaultAsync(e => e.UserId == id);
             if (employee != null)
             {
@@ -489,30 +300,6 @@ namespace BE.Controllers
             return Ok(new { message = $"Đã xóa nhân viên {user.FullName} thành công" });
         }
 
-        // ===========================
-        // 🔹 Lấy danh sách học viên
-        // ===========================
-        //[HttpGet("students")]
-        //public async Task<IActionResult> GetStudents()
-        //{
-        //    var students = await _context.Users
-        //        .Include(u => u.StudentProfile)
-        //        .Where(u => u.StudentProfile != null)
-        //        .ToListAsync();
-
-        //    var list = students.Select(u => new
-        //    {
-        //        u.Id,
-        //        u.FullName,
-        //        u.Email,
-        //        u.UserName,
-        //        u.DateOfBirth,
-        //        u.StudentProfile.ClassName,
-        //        u.StudentProfile.EnrollmentDate
-        //    });
-
-        //    return Ok(list);
-        //}
         [HttpGet("students/{id:guid}")]
         public async Task<IActionResult> GetStudentById(Guid id)
         {
@@ -587,32 +374,6 @@ namespace BE.Controllers
             return Ok(list);
         }
 
-        // ===========================
-        // 🔹 Lấy danh sách nhân viên
-        // ===========================
-        //[HttpGet("employees")]
-        //public async Task<IActionResult> GetEmployees()
-        //{
-        //    var employees = await _context.Users
-        //        .Include(u => u.EmployeeProfile)
-        //        .Where(u => u.EmployeeProfile != null)
-        //        .ToListAsync();
-
-        //    var list = employees.Select(u => new
-        //    {
-        //        u.Id,
-        //        u.FullName,
-        //        u.Email,
-        //        u.UserName,
-        //        u.EmployeeProfile.Phone,
-        //        u.EmployeeProfile.Position,
-        //        u.EmployeeProfile.Level,
-        //        u.EmployeeProfile.Salary,
-        //        u.EmployeeProfile.Status
-        //    });
-
-        //    return Ok(list);
-        //}
         [HttpGet("employees")]
         public async Task<IActionResult> GetEmployees(
         [FromQuery] string? search,

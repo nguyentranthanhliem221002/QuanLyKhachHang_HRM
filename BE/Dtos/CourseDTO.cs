@@ -2,7 +2,7 @@
 {
     public class CourseDTO
     {
-        public Guid Id { get; set; }           // Trước là int → đổi thành Guid
+        public Guid Id { get; set; }           
         public string Title { get; set; }
         public string Description { get; set; }
         public decimal Fee { get; set; }
@@ -11,7 +11,7 @@
         public string Grade { get; set; }
         public string Level { get; set; }
 
-        public Guid SubjectId { get; set; }    // Trước là int → đổi thành Guid
+        public Guid SubjectId { get; set; }   
         public string SubjectName { get; set; }
         public bool IsPaid { get; set; }
 

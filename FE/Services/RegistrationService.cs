@@ -12,7 +12,6 @@ namespace FE.Services
             _http = http;
         }
 
-        // Đăng ký học viên + khóa học
         public async Task<bool> RegisterStudentAsync(RegistrationViewModel model)
         {
             var response = await _http.PostAsJsonAsync("api/course/register", model);
@@ -27,7 +26,6 @@ namespace FE.Services
             return true;
         }
 
-        // Thanh toán MoMo
         public async Task<string> PayWithMoMoAsync(Guid userId, Guid courseId, decimal amount)
         {
             var model = new { UserId = userId, CourseId = courseId, Amount = amount };

@@ -12,7 +12,7 @@ namespace BE.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        private readonly ApplicationDbContext _context;  // ✅ Thêm DbContext
+        private readonly ApplicationDbContext _context; 
 
         public AuthController(
             UserManager<User> userManager,
@@ -40,7 +40,26 @@ namespace BE.Controllers
 
             var result = await _userManager.CreateAsync(user, req.Password);
             if (!result.Succeeded)
-                return BadRequest(new { message = string.Join(", ", result.Errors.Select(e => e.Description)) });
+            {
+                var errors = result.Errors.Select(e =>
+                {
+                    return e.Code switch
+                    {
+                        "PasswordTooShort" => "Mật khẩu phải có ít nhất 6 ký tự",
+                        "PasswordRequiresUpper" => "Mật khẩu phải có ít nhất 1 chữ in hoa",
+                        "PasswordRequiresLower" => "Mật khẩu phải có ít nhất 1 chữ thường",
+                        "PasswordRequiresDigit" => "Mật khẩu phải có ít nhất 1 chữ số",
+                        "PasswordRequiresNonAlphanumeric" => "Mật khẩu phải có ít nhất 1 ký tự đặc biệt",
+                        _ => e.Description
+                    };
+                });
+
+                return BadRequest(new
+                {
+                    message = string.Join(", ", errors)
+                });
+            }
+
 
             await _userManager.AddToRoleAsync(user, "Student");
 
@@ -91,7 +110,7 @@ namespace BE.Controllers
                 fullname = user.FullName,
                 email = user.Email,
                 role = roles.FirstOrDefault() ?? "Student",
-                userId = user.Id, // Guid
+                userId = user.Id, 
                 message = "Đăng nhập thành công"
             });
         }

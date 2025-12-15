@@ -54,7 +54,6 @@ namespace FE.Services
             var result = await _http.GetFromJsonAsync<List<CourseViewModel>>($"api/course/student/{studentId}");
             return result ?? new List<CourseViewModel>();
         }
-        // Gửi đăng ký học viên + khóa học
         public async Task<bool> RegisterStudentAsync(RegistrationViewModel model)
         {
             var response = await _http.PostAsJsonAsync("api/course/register", model);

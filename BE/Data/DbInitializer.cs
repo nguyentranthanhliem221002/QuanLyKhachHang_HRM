@@ -54,7 +54,6 @@ namespace BE.Data
 
                     await userManager.AddToRoleAsync(user, role);
 
-                    // Seed Employee
                     if (role == "Teacher")
                     {
                         var employee = new Employee
@@ -69,7 +68,6 @@ namespace BE.Data
                         };
                         context.Employees.Add(employee);
                     }
-                    // Seed Student
                     else if (role == "Student")
                     {
                         var student = new Student

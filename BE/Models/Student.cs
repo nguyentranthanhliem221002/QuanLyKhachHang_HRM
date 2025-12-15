@@ -7,8 +7,8 @@ namespace BE.Models
         public Guid Id { get; set; }
         public string StudentCode { get; set; } = string.Empty;
         public string ClassName { get; set; } = string.Empty;
-        public string Grade { get; set; } = string.Empty;   // thêm
-        public string Level { get; set; } = string.Empty;   // thêm
+        public string Grade { get; set; } = string.Empty;   
+        public string Level { get; set; } = string.Empty;  
         public DateTime EnrollmentDate { get; set; }
         public string Phone { get; set; } = string.Empty;
 

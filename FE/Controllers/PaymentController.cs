@@ -17,7 +17,6 @@ public class PaymentController : Controller
         _courseService = courseService;
     }
 
-    // Trang thanh toán
     public async Task<IActionResult> Index(Guid id)
     {
         var course = await _courseService.GetCourseByIdAsync(id);
@@ -54,7 +53,6 @@ public class PaymentController : Controller
         return Redirect(payUrl);
     }
 
-    // Nhận callback từ MoMo (ReturnUrl)
     [AllowAnonymous]
     public async Task<IActionResult> MoMoReturn(string orderId, string resultCode, Guid courseId, Guid userId)
     {
@@ -77,16 +75,7 @@ public class PaymentController : Controller
 
         return View(payment);
     }
-    //public async Task<IActionResult> Details(string orderId)
-    //{
-    //    var userId = new Guid(User.FindFirstValue(ClaimTypes.NameIdentifier));
-    //    var payment = await _paymentService.GetPaymentDetailsAsync(orderId, userId);
-    //    if (payment == null)
-    //        return NotFound();
-
-    //    return View(payment);
-    //}
-
+ 
     public async Task<IActionResult> History()
     {
         var userId = new Guid(User.FindFirstValue(ClaimTypes.NameIdentifier));

@@ -9,6 +9,6 @@ namespace BE.Dtos.Requests
         public string Position { get; set; } = string.Empty;
         public string Level { get; set; } = string.Empty;
         public decimal Salary { get; set; }
-        public int Status { get; set; }   // 🔹 Thêm
+        public int Status { get; set; }   
     }
 }

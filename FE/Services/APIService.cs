@@ -10,15 +10,6 @@ namespace FE.Services
         {
             _httpClient = httpClient;
         }
-
-        //public async Task<List<CustomerViewModel>> GetCustomersAsync()
-        //{
-        //    var response = await _httpClient.GetAsync("api/customer");
-        //    response.EnsureSuccessStatusCode();
-
-        //    var data = await response.Content.ReadFromJsonAsync<List<CustomerViewModel>>();
-        //    return data ?? new List<CustomerViewModel>();
-        //}
     }
 
 }

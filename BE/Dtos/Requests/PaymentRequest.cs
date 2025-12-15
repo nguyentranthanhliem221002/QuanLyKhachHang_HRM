@@ -8,7 +8,7 @@ namespace BE.Dtos.Requests
         public Guid userId { get; set; }
         public Guid courseId { get; set; }
         public decimal amount { get; set; }
-        public bool isPaid { get; set; } // ← thêm
+        public bool isPaid { get; set; } 
 
     }
 }

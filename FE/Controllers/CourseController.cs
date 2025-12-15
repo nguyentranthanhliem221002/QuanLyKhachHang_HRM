@@ -13,14 +13,12 @@ namespace FE.Controllers
             _courseService = courseService;
         }
 
-        // Danh sách khóa học
         public async Task<IActionResult> Index()
         {
             var courses = await _courseService.GetAllCoursesAsync();
             return View(courses);
         }
 
-        // Chi tiết khóa học
         public async Task<IActionResult> Detail(Guid id)
         {
             var course = await _courseService.GetCourseByIdAsync(id);
@@ -48,7 +46,6 @@ namespace FE.Controllers
         }
 
 
-        // POST: Xử lý đăng ký
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegistrationViewModel model)

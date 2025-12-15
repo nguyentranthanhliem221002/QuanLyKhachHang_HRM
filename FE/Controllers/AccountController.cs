@@ -19,6 +19,7 @@ namespace FE.Controllers
         public IActionResult Register() => View();
 
         [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> Register(UserViewModel model)
         {
             if (!ModelState.IsValid)
@@ -26,15 +27,23 @@ namespace FE.Controllers
 
             var message = await _accountService.RegisterAsync(model);
 
-            if (string.IsNullOrEmpty(message))
+            if (message == null)
             {
-                ViewBag.Error = "Không thể đăng ký. Vui lòng thử lại.";
+                ViewBag.Error = "Không thể đăng ký.";
+                return View(model);
+            }
+
+            // nếu BE trả lỗi thì không redirect
+            if (!message.Contains("thành công"))
+            {
+                ViewBag.Error = message;
                 return View(model);
             }
 
             TempData["SuccessMessage"] = message;
             return RedirectToAction("Login");
         }
+
 
         public IActionResult AccessDenied() => View();
 

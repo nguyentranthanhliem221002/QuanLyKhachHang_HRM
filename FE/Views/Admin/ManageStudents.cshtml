@@ -37,8 +37,8 @@
             <th>#</th>
             <th>Họ và tên</th>
             <th>Email</th>
-            <th>Số điện thoại</th>     <!-- Thêm -->
-            <th>Ngày sinh</th>         <!-- Thêm -->
+            <th>Số điện thoại</th>     
+            <th>Ngày sinh</th>        
             <th>Lớp</th>
             <th>Mức học</th>
             <th>Ngày nhập học</th>
@@ -50,7 +50,6 @@
     <tbody></tbody>
 </table>
 
-<!-- Modal Thêm/Sửa học viên -->
 <div class="modal fade" id="studentModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -157,7 +156,7 @@
             });
         }
 
-        // --- Load danh sách ---
+
         async function loadStudents() {
             const params = new URLSearchParams({
                 search: document.getElementById('searchStudent').value.trim(),
@@ -173,14 +172,14 @@
             }
         }
 
-        // --- Modal Thêm ---
+ 
         function openStudentModal() {
             document.getElementById('studentForm').reset();
             document.getElementById('stuId').value = "-1";
             new bootstrap.Modal(document.getElementById('studentModal')).show();
         }
 
-        // --- Modal Sửa ---
+
         async function editStudent(id) {
             try {
                 const stu = await callApi(`${apiUrl}/${id}`);
@@ -200,7 +199,7 @@
             }
         }
 
-        // --- Xóa ---
+
         async function deleteStudent(id) {
             const result = await Swal.fire({
                 icon: 'warning',

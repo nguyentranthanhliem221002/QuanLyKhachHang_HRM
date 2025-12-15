@@ -48,7 +48,6 @@
     <tbody></tbody>
 </table>
 
-<!-- Modal Thêm/Sửa khóa học -->
 <div class="modal fade" id="courseModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -121,7 +120,6 @@
         const filterSubjectSelect = document.getElementById('filterSubject');
         let subjects = [];
 
-        // --- Load danh sách môn học ---
         async function loadSubjects() {
             try {
                 subjects = await callApi(subjectApiUrl); // [{ id, name }]
@@ -143,7 +141,6 @@
             }
         }
 
-        // --- Hiển thị danh sách khóa học ---
         function renderCourses(list) {
             const tbody = document.querySelector('#coursesTable tbody');
             tbody.innerHTML = '';
@@ -174,7 +171,6 @@
             tbody.appendChild(fragment);
         }
 
-        // --- Load khóa học ---
         async function loadCourses() {
             const query = new URLSearchParams({
                 search: document.getElementById('searchCourse').value.trim(),
@@ -190,14 +186,12 @@
             }
         }
 
-        // --- Thêm khóa học ---
         function openAddModal() {
             document.getElementById('courseForm').reset();
             document.getElementById('courseId').value = "-1";
             new bootstrap.Modal(document.getElementById('courseModal')).show();
         }
 
-        // --- Sửa khóa học ---
         async function editCourse(id) {
             try {
                 const c = await callApi(`${apiUrl}/${id}`);
@@ -216,7 +210,6 @@
             }
         }
 
-        // --- Xóa khóa học ---
         async function deleteCourse(id) {
             const result = await Swal.fire({
                 icon: 'warning',
@@ -237,7 +230,6 @@
             }
         }
 
-        // --- Submit thêm/sửa ---
         document.getElementById('courseForm').addEventListener('submit', async e => {
             e.preventDefault();
             const id = document.getElementById('courseId').value;
@@ -263,14 +255,12 @@
             }
         });
 
-        // --- Filter / tìm kiếm ---
         ['searchCourse','filterGrade','filterLevel','filterSubject'].forEach(id=>{
             const el = document.getElementById(id);
             const event = id==='searchCourse' ? 'input':'change';
             el.addEventListener(event, loadCourses);
         });
 
-        // --- Load lần đầu ---
         loadSubjects().then(loadCourses);
     </script>
 }
