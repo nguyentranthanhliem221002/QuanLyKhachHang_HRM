@@ -2,10 +2,10 @@
 # QuanLyKhachHang_HRM - Docker & Git Setup
 # ==========================
 
-# 1️⃣ SSH vào EC2
+# 1/ SSH vào EC2
 ### ssh -i "your-key.pem" ec2-user@EC2_PUBLIC_IP
 
-# 2️⃣ Gỡ Docker & Git cũ
+# 2/ Gỡ Docker & Git cũ
 #### sudo dnf remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine containerd.io
 #### sudo rm -rf /var/lib/docker /var/lib/containerd /etc/docker /run/docker
 #### sudo rm -f /usr/lib/systemd/system/docker.service
@@ -14,13 +14,13 @@
 #### sudo rm -rf /var/lib/docker /var/lib/containerd /etc/docker /run/docker
 #### sudo yum remove -y git
 
-# 3️⃣ Cài Docker & Git mới
+# 3/ Cài Docker & Git mới
 #### sudo dnf install -y docker
 #### sudo systemctl enable --now docker
 #### sudo usermod -aG docker ec2-user
 #### sudo dnf install -y git
 
-# 4️⃣ Kiểm tra Docker & Git
+# 4/ Kiểm tra Docker & Git
 #### docker --version
 #### sudo systemctl status docker
 #### docker ps
@@ -29,7 +29,7 @@
 
 #### echo "✅ Docker & Git đã cài xong! Logout & login lại SSH để áp dụng quyền Docker cho user."
 
-# 5️⃣ Các thao tác Docker cơ bản
+# 5/ Các thao tác Docker cơ bản
 
 ## Xem container
 #### docker ps           # Xem container đang chạy
@@ -59,7 +59,7 @@
 #### docker rmi image_id
 #### docker rmi image_name:tag
 
-# 6️⃣ Docker Compose (nếu nhiều service)
+# 6/ Docker Compose (nếu nhiều service)
 cat <<EOF > docker-compose.yml
 version: "3.9"
 services:
