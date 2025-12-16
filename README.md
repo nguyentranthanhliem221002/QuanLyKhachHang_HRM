@@ -1,156 +1,101 @@
-# QuanLyKhachHang_HRM
+# ==========================
+# QuanLyKhachHang_HRM - Docker & Git Setup
+# ==========================
 
-Dự án **Quản lý khách hàng HRM** sử dụng **ASP.NET Core** cho Backend và Frontend, container hóa bằng **Docker**.
+# 1️⃣ SSH vào EC2
+ssh -i "your-key.pem" ec2-user@EC2_PUBLIC_IP
 
-# Hướng dẫn chạy dự án ASP.NET với Docker
+# --- Bắt đầu copy từ đây ---
+# 2️⃣ Gỡ Docker & Git cũ
+sudo dnf remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine containerd.io
+sudo rm -rf /var/lib/docker /var/lib/containerd /etc/docker /run/docker
+sudo rm -f /usr/lib/systemd/system/docker.service
+sudo rm -f /usr/lib/systemd/system/docker.socket
+sudo systemctl daemon-reload
+sudo rm -rf /var/lib/docker /var/lib/containerd /etc/docker /run/docker
+sudo yum remove -y git
 
-# 1️⃣ Kiểm tra & cài đặt WSL + Ubuntu
-#### wsl --list --verbose            # Xem các distro Linux đã cài
-#### wsl --update                    # Cập nhật WSL lên phiên bản mới nhất
-#### wsl --install -d Ubuntu-22.04   # Cài Ubuntu 22.04 nếu chưa có
-#### wsl --shutdown                  # Tắt tất cả WSL để áp dụng cập nhật
-#### wsl --list --verbose            # Kiểm tra lại distro đã cài
+# 3️⃣ Cài Docker & Git mới
+sudo dnf install -y docker
+sudo systemctl enable --now docker
+sudo usermod -aG docker ec2-user
+sudo dnf install -y git
 
-# 2️⃣ Cài đặt Docker & Docker Compose
-#### docker --version
-#### docker-compose --version
+# 4️⃣ Kiểm tra Docker & Git
+docker --version
+sudo systemctl status docker
+docker ps
+docker run hello-world
+git --version
 
-# 3️⃣ Build Docker Image
-#### docker build -t hrm-be ./BE     # Build image cho Backend
-#### docker build -t hrm-fe ./FE     # Build image cho Frontend
+echo "✅ Docker & Git đã cài xong! Logout & login lại SSH để áp dụng quyền Docker cho user."
 
-#4️⃣ Docker Compose (chạy toàn bộ dự án)
-#### docker-compose down -v          # Dừng container cũ + xóa volume
-#### docker-compose up --build -d    # Build và chạy toàn bộ container BE + FE
-#### docker-compose stop             # Dừng container
-#### docker-compose start            # Khởi động lại container
+# 5️⃣ Các thao tác Docker cơ bản
 
-# 5️⃣ Chạy SQL Server Container (tuỳ chọn)
-#### docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=Abc12345!" `
--p 1433:1433 --name sqlserver -d mcr.microsoft.com/mssql/server:2022-latest
+## Xem container
+docker ps           # Xem container đang chạy
+docker ps -a        # Xem tất cả container
 
-# 6️⃣ Tạo chứng chỉ HTTPS cho ASP.NET
-#### dotnet dev-certs https -ep ./https/aspnetapp.pfx -p 123456
-#### dotnet dev-certs https --trust
+## Chạy container
+docker run -d -p 5000:5000 myapp-be:1.0
+docker run -d -p 5001:5001 myapp-fe:1.0
 
-# 7️⃣ Cấu hình file .env
-ASPNETCORE_ENVIRONMENT=Docker
-ASPNETCORE_URLS=https://+:443;http://+:8080
-ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-ASPNETCORE_Kestrel__Certificates__Default__Password=123456
+## Dừng / Restart / Xóa container
+docker stop container_id
+docker start container_id
+docker restart container_id
+docker rm container_id
+docker rm -f container_id    # Xóa container đang chạy
 
-API_URL=https://be:443
+## Xem log container
+docker logs container_id
+docker logs -f container_id  # Theo dõi log realtime
 
-DB_HOST=sqlserver
-DB_PORT=1433
-DB_NAME=HeThongQLKH_DB
-DB_USER=sa
-SA_PASSWORD=Abc12345!
+## Build Docker image
+docker build -t myapp-be:1.0 ./BE
+docker build -t myapp-fe:1.0 ./FE
 
+## Xem & xóa image
+docker images
+docker rmi image_id
+docker rmi image_name:tag
 
-#### .env-fe
-ASPNETCORE_ENVIRONMENT=Production
-ASPNETCORE_URLS=https://+:443;http://+:8080
+# 6️⃣ Docker Compose (nếu nhiều service)
+cat <<EOF > docker-compose.yml
+version: "3.9"
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Abc12345!"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
 
-ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-ASPNETCORE_Kestrel__Certificates__Default__Password=123456
+  backend:
+    build: ./BE
+    ports:
+      - "5000:5000"
+    depends_on:
+      - sqlserver
 
-BackendApi__BaseUrl=https://98.95.20.86:5000
+  frontend:
+    build: ./FE
+    ports:
+      - "5001:5001"
+    depends_on:
+      - backend
 
-#### .env-be
-ASPNETCORE_ENVIRONMENT=Production
-ASPNETCORE_URLS=https://+:443;http://+:8080
+volumes:
+  sql_data:
+EOF
 
-ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
-ASPNETCORE_Kestrel__Certificates__Default__Password=123456
+# Chạy tất cả service
+docker-compose up -d
 
-DB_HOST=sqlserver
-DB_PORT=1433
-DB_NAME=HeThongQLKH_DB
-DB_USER=sa
-SA_PASSWORD=Abc12345!
-
-ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=HeThongQLKH_DB;User Id=sa;Password=Abc12345!;TrustServerCertificate=True;
-
-
-# 8️⃣ Cấu hình chuỗi kết nối trong appsettings.json (BE)
-"ConnectionStrings": {
-  "DefaultConnection": "Server=sqlserver,1433;Database=HeThongQLKH_DB;User Id=sa;Password=Abc12345!;TrustServerCertificate=True;"
-},
-"Frontend": {
-  "BaseUrl": "http://localhost:5001"
-}
-
-# 9️⃣ Push Image lên Docker Hub (tùy chọn)
-### Đăng nhập Docker Hub
-#### docker login
-
-### Build & gắn tag
-#### docker build -t nguyentranthanhliem221002/be:1.0 ./BE -f ./BE/Dockerfile
-#### docker build -t nguyentranthanhliem221002/fe:1.0 ./FE -f ./FE/Dockerfile
-
-### Push lên Docker Hub
-#### docker push nguyentranthanhliem221002/be:1.0
-#### docker push nguyentranthanhliem221002/fe:1.0
-
-### 👉 Sau khi đẩy, có thể pull image từ bất kỳ máy nào khác:
-#### docker pull nguyentranthanhliem221002/be:1.0
-#### docker pull nguyentranthanhliem221002/fe:1.0
-
-# 🔟 Triển khai Lên AWS (ECS + ECR)
-## 🧱 Bước 1: Cấu hình AWS CLI
-
-### Cài đặt AWS CLI:
-#### https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
-### 🔗 Hướng dẫn chính thức
-#### aws configure
-### Nhập thông tin:
-####  AWS Access Key ID: <access-key>
-####  AWS Secret Access Key: <secret-key>
-####  Default region name: ap-southeast-1
-####  Default output format: json
-
-## 📦 Bước 2: Tạo Repository ECR
-#### aws ecr create-repository --repository-name hrm-be --region ap-southeast-1
-#### aws ecr create-repository --repository-name hrm-fe --region ap-southeast-1
-
-
-### AWS sẽ trả về URL dạng:
-
-#### 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/hrm-be
-
-## 🚚 Bước 3: Push Image lên AWS ECR
-### Đăng nhập vào ECR
-aws ecr get-login-password --region ap-southeast-1 | docker login --username AWS --password-stdin 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com
-
-### Tag lại image
-#### docker tag hrm-be 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/hrm-be:1.0
-#### docker tag hrm-fe 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/hrm-fe:1.0
-
-### Push image
-#### docker push 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/hrm-be:1.0
-#### docker push 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/hrm-fe:1.0
-
-## ☁️ Bước 4: Triển khai Lên AWS ECS (Fargate)
-
-Truy cập AWS Console → ECS → Create Cluster
-
-Chọn Networking Only (Fargate)
-
-Tạo Task Definition:
-
-Container 1: hrm-be → Image từ ECR → Port 8080
-
-Container 2: hrm-fe → Image từ ECR → Port 80
-
-Add environment variables (API_URL, DB connection string, …)
-
-Tạo Service → Fargate → Cluster → Deploy Task
-
-ECS sẽ tự động tạo Load Balancer nếu chọn, FE sẽ có URL public.
-
-## 🌐 Bước 5: Truy cập Ứng Dụng
-
-#### FE: Truy cập Load Balancer URL hiển thị trong ECS console
-
-#### BE: API nội bộ gọi từ FE qua http://be:8080 hoặc qua domain ECS nội bộ
+# Kiểm tra
+docker-compose ps
+docker-compose logs -f
