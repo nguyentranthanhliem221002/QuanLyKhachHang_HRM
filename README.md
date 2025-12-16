@@ -112,3 +112,40 @@ EOF
 
 # 14/ Truy cập Frontend
 #### https://13.223.107.213:5001
+
+# 15/ Truy cập Frontend & Backend với IP tĩnh (Elastic IP) và các port dịch vụ
+
+# Mục tiêu: cả FE và BE dùng IP public cố định (Elastic IP) để truy cập dịch vụ ổn định, không thay đổi khi restart EC2.
+
+### Tạo và gán Elastic IP trên AWS cho cả 2 EC2
+#### - Vào AWS Console → VPC → Elastic IPs → Allocate Elastic IP
+#### - Tạo 1 IP tĩnh cho BE, 1 IP tĩnh cho FE
+#### - Gán Elastic IP cho từng EC2:
+####     - Elastic IP BE → EC2 Backend
+####     - Elastic IP FE → EC2 Frontend
+####  - Chọn Elastic IP → Actions → Associate Elastic IP → chọn instance tương ứng
+
+### Cấu hình các port trên Backend (BE)
+####  - 5000 → Swagger / API (HTTPS)
+#### - 3001 → SQLPad (HTTP, web quản lý SQL Server)
+#### - 8081 → Adminer (HTTP, web quản lý database)
+
+### Cấu hình port trên Frontend (FE)
+#### - 5001 → Frontend web (HTTPS)
+
+### Truy cập các dịch vụ bằng Elastic IP
+#### - Backend Swagger/API: https://<BE-Elastic-IP>:5000/swagger
+#### - SQLPad: http://<BE-Elastic-IP>:3001
+#### - Adminer: http://<BE-Elastic-IP>:8081
+#### - Frontend web: https://<FE-Elastic-IP>:5001
+
+### FE gọi API BE
+#### - Trong cấu hình FE (file config hoặc biến môi trường), dùng URL BE Elastic IP:
+####    API_URL=https://<BE-Elastic-IP>:5000
+
+### Kết quả:
+#### - FE & BE luôn dùng IP tĩnh
+#### - Các dịch vụ trên BE có port cố định: Swagger 5000 (HTTPS), SQLPad 3001 (HTTP), Adminer 8081 (HTTP)
+#### - Frontend luôn truy cập được qua port 5001 (HTTPS)
+#### - Không cần thay đổi khi restart EC2
+
