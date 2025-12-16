@@ -5,7 +5,6 @@
 # 1️⃣ SSH vào EC2
 ### ssh -i "your-key.pem" ec2-user@EC2_PUBLIC_IP
 
-# --- Bắt đầu copy từ đây ---
 # 2️⃣ Gỡ Docker & Git cũ
 ### sudo dnf remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine containerd.io
 ### sudo rm -rf /var/lib/docker /var/lib/containerd /etc/docker /run/docker
