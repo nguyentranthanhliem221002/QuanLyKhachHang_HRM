@@ -1,11 +1,11 @@
 # ==========================
-# QuanLyKhachHang_HRM - Docker & Git Setup
+# QuanLyKhachHang_HRM - Docker & Git Setup (2 EC2: BE & FE)
 # ==========================
 
-# 1/ SSH vào EC2
-### ssh -i "your-key.pem" ec2-user@EC2_PUBLIC_IP
+# 1️⃣ SSH vào Backend EC2 (BE)
+#### ssh -i "your-key.pem" ec2-user@98.95.20.86
 
-# 2/ Gỡ Docker & Git cũ
+# 2️⃣ Gỡ Docker & Git cũ
 #### sudo dnf remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine containerd.io
 #### sudo rm -rf /var/lib/docker /var/lib/containerd /etc/docker /run/docker
 #### sudo rm -f /usr/lib/systemd/system/docker.service
@@ -14,52 +14,36 @@
 #### sudo rm -rf /var/lib/docker /var/lib/containerd /etc/docker /run/docker
 #### sudo yum remove -y git
 
-# 3/ Cài Docker & Git mới
+# 3️⃣ Cài Docker & Git mới
 #### sudo dnf install -y docker
 #### sudo systemctl enable --now docker
 #### sudo usermod -aG docker ec2-user
 #### sudo dnf install -y git
 
-# 4/ Kiểm tra Docker & Git
+# 4️⃣ Kiểm tra Docker & Git
 #### docker --version
 #### sudo systemctl status docker
 #### docker ps
 #### docker run hello-world
 #### git --version
-
 #### echo "✅ Docker & Git đã cài xong! Logout & login lại SSH để áp dụng quyền Docker cho user."
 
-# 5/ Các thao tác Docker cơ bản
-
-## Xem container
+# 5️⃣ Các thao tác Docker cơ bản
 #### docker ps           # Xem container đang chạy
 #### docker ps -a        # Xem tất cả container
-
-## Chạy container
-#### docker run -d -p 5000:5000 myapp-be:1.0
-#### docker run -d -p 5001:5001 myapp-fe:1.0
-
-## Dừng / Restart / Xóa container
 #### docker stop container_id
 #### docker start container_id
 #### docker restart container_id
 #### docker rm container_id
-#### docker rm -f container_id    # Xóa container đang chạy
-
-## Xem log container
+#### docker rm -f container_id
 #### docker logs container_id
-#### docker logs -f container_id  # Theo dõi log realtime
-
-## Build Docker image
+#### docker logs -f container_id
 #### docker build -t myapp-be:1.0 ./BE
-#### docker build -t myapp-fe:1.0 ./FE
-
-## Xem & xóa image
 #### docker images
 #### docker rmi image_id
 #### docker rmi image_name:tag
 
-# 6/ Docker Compose (nếu nhiều service)
+# 6️⃣ Docker Compose cho Backend + SQL Server
 cat <<EOF > docker-compose.yml
 version: "3.9"
 services:
@@ -70,31 +54,61 @@ services:
       ACCEPT_EULA: "Y"
       SA_PASSWORD: "Abc12345!"
     ports:
-      - "1433:1433"
+      - "3001:1433"   # SQL Server port 1
+      - "8081:1433"   # SQL Server port 2
     volumes:
       - sql_data:/var/opt/mssql
 
   backend:
     build: ./BE
     ports:
-      - "5000:5000"
+      - "5000:5000"   # BE API
     depends_on:
       - sqlserver
-
-  frontend:
-    build: ./FE
-    ports:
-      - "5001:5001"
-    depends_on:
-      - backend
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=YourDB;User Id=sa;Password=Abc12345!;"
 
 volumes:
   sql_data:
 EOF
 
-# Chạy tất cả service
+# 7️⃣ Chạy tất cả service trên BE
 #### docker-compose up -d --build
-
-# Kiểm tra
 #### docker-compose ps
 #### docker-compose logs -f
+
+# 8️⃣ Truy cập Backend
+####  Swagger: http://98.95.20.86:5000/swagger
+####  SQL Server (nếu mở port 3001/8081): 98.95.20.86,3001
+
+# 9️⃣ SSH vào Frontend EC2 (FE)
+#### ssh -i "your-key.pem" ec2-user@13.223.107.213
+
+# 10️⃣ Gỡ Docker & Git cũ trên FE
+#### sudo dnf remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine containerd.io
+#### sudo rm -rf /var/lib/docker /var/lib/containerd /etc/docker /run/docker
+#### sudo rm -f /usr/lib/systemd/system/docker.service
+#### sudo rm -f /usr/lib/systemd/system/docker.socket
+#### sudo systemctl daemon-reload
+#### sudo yum remove -y git
+
+# 11️⃣ Cài Docker & Git mới trên FE
+#### sudo dnf install -y docker
+#### sudo systemctl enable --now docker
+#### sudo usermod -aG docker ec2-user
+#### sudo dnf install -y git
+
+# 12️⃣ Kiểm tra Docker & Git trên FE
+#### docker --version
+#### sudo systemctl status docker
+#### docker ps
+#### docker run hello-world
+#### git --version
+#### echo "✅ Docker & Git FE đã cài xong!"
+
+# 13️⃣ Chạy FE container (FE gọi BE API: http://98.95.20.86:5000)
+#### docker build -t myapp-fe:1.0 ./FE
+#### docker run -d -p 5001:5001 myapp-fe:1.0
+
+# 14️⃣ Truy cập Frontend
+#### http://13.223.107.213:5001
