@@ -2,10 +2,10 @@
 # QuanLyKhachHang_HRM - Docker & Git Setup (2 EC2: BE & FE)
 # ==========================
 
-# 1️⃣ SSH vào Backend EC2 (BE)
+# 1/ SSH vào Backend EC2 (BE)
 #### ssh -i "your-key.pem" ec2-user@98.95.20.86
 
-# 2️⃣ Gỡ Docker & Git cũ
+# 2/ Gỡ Docker & Git cũ
 #### sudo dnf remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine containerd.io
 #### sudo rm -rf /var/lib/docker /var/lib/containerd /etc/docker /run/docker
 #### sudo rm -f /usr/lib/systemd/system/docker.service
@@ -14,13 +14,13 @@
 #### sudo rm -rf /var/lib/docker /var/lib/containerd /etc/docker /run/docker
 #### sudo yum remove -y git
 
-# 3️⃣ Cài Docker & Git mới
+# 3/ Cài Docker & Git mới
 #### sudo dnf install -y docker
 #### sudo systemctl enable --now docker
 #### sudo usermod -aG docker ec2-user
 #### sudo dnf install -y git
 
-# 4️⃣ Kiểm tra Docker & Git
+# 4/ Kiểm tra Docker & Git
 #### docker --version
 #### sudo systemctl status docker
 #### docker ps
@@ -28,7 +28,7 @@
 #### git --version
 #### echo "✅ Docker & Git đã cài xong! Logout & login lại SSH để áp dụng quyền Docker cho user."
 
-# 5️⃣ Các thao tác Docker cơ bản
+# 5/ Các thao tác Docker cơ bản
 #### docker ps           # Xem container đang chạy
 #### docker ps -a        # Xem tất cả container
 #### docker stop container_id
@@ -43,7 +43,7 @@
 #### docker rmi image_id
 #### docker rmi image_name:tag
 
-# 6️⃣ Docker Compose cho Backend + SQL Server
+# 6/ Docker Compose cho Backend + SQL Server
 cat <<EOF > docker-compose.yml
 version: "3.9"
 services:
@@ -72,19 +72,19 @@ volumes:
   sql_data:
 EOF
 
-# 7️⃣ Chạy tất cả service trên BE
+# 7/ Chạy tất cả service trên BE
 #### docker-compose up -d --build
 #### docker-compose ps
 #### docker-compose logs -f
 
-# 8️⃣ Truy cập Backend
+# 8/ Truy cập Backend
 ####  Swagger: http://98.95.20.86:5000/swagger
 ####  SQL Server (nếu mở port 3001/8081): 98.95.20.86,3001
 
-# 9️⃣ SSH vào Frontend EC2 (FE)
+# 9/ SSH vào Frontend EC2 (FE)
 #### ssh -i "your-key.pem" ec2-user@13.223.107.213
 
-# 10️⃣ Gỡ Docker & Git cũ trên FE
+# 10/ Gỡ Docker & Git cũ trên FE
 #### sudo dnf remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-engine containerd.io
 #### sudo rm -rf /var/lib/docker /var/lib/containerd /etc/docker /run/docker
 #### sudo rm -f /usr/lib/systemd/system/docker.service
@@ -92,13 +92,13 @@ EOF
 #### sudo systemctl daemon-reload
 #### sudo yum remove -y git
 
-# 11️⃣ Cài Docker & Git mới trên FE
+# 11/ Cài Docker & Git mới trên FE
 #### sudo dnf install -y docker
 #### sudo systemctl enable --now docker
 #### sudo usermod -aG docker ec2-user
 #### sudo dnf install -y git
 
-# 12️⃣ Kiểm tra Docker & Git trên FE
+# 12/ Kiểm tra Docker & Git trên FE
 #### docker --version
 #### sudo systemctl status docker
 #### docker ps
@@ -106,9 +106,9 @@ EOF
 #### git --version
 #### echo "✅ Docker & Git FE đã cài xong!"
 
-# 13️⃣ Chạy FE container (FE gọi BE API: http://98.95.20.86:5000)
+# 13/ Chạy FE container (FE gọi BE API: http://98.95.20.86:5000)
 #### docker build -t myapp-fe:1.0 ./FE
 #### docker run -d -p 5001:5001 myapp-fe:1.0
 
-# 14️⃣ Truy cập Frontend
+# 14/ Truy cập Frontend
 #### http://13.223.107.213:5001
