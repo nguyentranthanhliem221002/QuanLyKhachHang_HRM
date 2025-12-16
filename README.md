@@ -78,7 +78,7 @@ EOF
 #### docker-compose logs -f
 
 # 8/ Truy cập Backend
-####  Swagger: http://98.95.20.86:5000/swagger
+####  Swagger: https://98.95.20.86:5000/swagger
 ####  SQL Server (nếu mở port 3001/8081): 98.95.20.86,3001
 
 # 9/ SSH vào Frontend EC2 (FE)
@@ -106,9 +106,9 @@ EOF
 #### git --version
 #### echo "✅ Docker & Git FE đã cài xong!"
 
-# 13/ Chạy FE container (FE gọi BE API: http://98.95.20.86:5000)
+# 13/ Chạy FE container (FE gọi BE API: https://98.95.20.86:5000)
 #### docker build -t myapp-fe:1.0 ./FE
 #### docker run -d -p 5001:5001 myapp-fe:1.0
 
 # 14/ Truy cập Frontend
-#### http://13.223.107.213:5001
+#### https://13.223.107.213:5001
