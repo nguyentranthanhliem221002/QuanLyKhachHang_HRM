@@ -94,7 +94,7 @@ volumes:
 EOF
 
 # Chạy tất cả service
-### docker-compose up -d
+### docker-compose up -d --build
 
 # Kiểm tra
 ### docker-compose ps
